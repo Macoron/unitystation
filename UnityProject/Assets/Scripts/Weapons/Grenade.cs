@@ -149,10 +149,44 @@ public class Grenade : NetworkBehaviour, IInteractable<HandActivate>, IOnStageCl
 		hasExploded = true;
 		if (isServer)
 		{
+			DropFromContainer();
+
 			PlaySoundAndShake();
 			CreateShape();
 			CalcAndApplyExplosionDamage(damagedBy);
-			objectBehaviour.VisibleState = false; //todo: should probably destroy such things (or return into pool) instead of hiding
+
+			// Return grenade to pool after explosion
+			PoolManager.PoolNetworkDestroy(gameObject);
+
+			//Vector2 explosionPos = objectBehaviour.AssumedWorldPositionServer().To2Int();
+			//GetComponent<CustomNetTransform>().ForceDrop(explosionPos);
+			//objectBehaviour.VisibleState = false; //todo: should probably destroy such things (or return into pool) instead of hiding
+		}
+	}
+
+	private void DropFromContainer()
+	{
+		var currentContainer = objectBehaviour.parentContainer;
+		if (currentContainer)
+		{
+			print(currentContainer);
+
+			var player = currentContainer.GetComponent<PlayerNetworkActions>();
+			if (player)
+			{
+				var slot = player.GetInventorySlot(gameObject);
+				if (slot != null)
+				{
+					print(slot.equipSlot);
+					player.DropItem(slot.equipSlot);
+				}
+				else
+				{
+					var errorMsg = string.Format("Player {0} is container for item {1}, " +
+						"but can't find inventory slot", player, gameObject);
+					Logger.LogWarning(errorMsg, Category.Containers);
+				}
+			}
 		}
 	}
 
