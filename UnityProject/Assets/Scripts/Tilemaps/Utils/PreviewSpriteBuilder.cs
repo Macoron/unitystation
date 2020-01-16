@@ -112,6 +112,11 @@ using UnityEngine;
 		private static Sprite SaveSpriteToEditorPath(IReadOnlyList<Sprite> sprites, Object obj)
 		{
 			Sprite sprite = MergeSprites(sprites);
+			if (sprite == null)
+			{
+				Debug.LogError("Looks like " + obj + " is missing some sprites in sprite renderer!");
+				return null;
+			}
 
 			string path = GetSpritePath(obj);
 
