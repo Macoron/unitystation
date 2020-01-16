@@ -342,6 +342,9 @@ public class LightingSystem : MonoBehaviour
 			mTextureDataRequest.Dispose();
 			mTextureDataRequest = null;
 		}
+
+		// Release post processing materials
+		mPostProcessingStack.Dispose();
 	}
 
 	private void Update()

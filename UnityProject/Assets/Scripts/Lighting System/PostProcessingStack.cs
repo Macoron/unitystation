@@ -1,16 +1,18 @@
 ﻿using System;
 using UnityEngine;
 
-public class PostProcessingStack
+public class PostProcessingStack : IDisposable
 {
 	private readonly MaterialContainer mMaterialContainer;
 	private RenderTexture mBlurRenderTexture;
 	private RenderTexture mBlurRenderTextureLight;
 	private RenderTexture mBlurRenderTextureOccLight;
+	private Vector3 positionOffsetOrig;
 
 	public PostProcessingStack(MaterialContainer iMaterialContainer)
 	{
 		mMaterialContainer = iMaterialContainer;
+		positionOffsetOrig = mMaterialContainer.fovMaterial.GetVector("_PositionOffset");
 	}
 
 	private RenderTexture blurRenderTexture
@@ -250,5 +252,10 @@ public class PostProcessingStack
 		}
 
 		return true;
+	}
+
+	public void Dispose()
+	{
+		mMaterialContainer.floorFovMaterial.SetVector("_PositionOffset", positionOffsetOrig);
 	}
 }
