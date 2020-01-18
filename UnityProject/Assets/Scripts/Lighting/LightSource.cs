@@ -32,6 +32,14 @@ public class LightSource : ObjectTrigger
 	private const LightState InitialState = LightState.Off;
 
 	private readonly Dictionary<LightState, Sprite> mSpriteDictionary = new Dictionary<LightState, Sprite>((int)LightState.TypeCount);
+	[Header("Light sprite")]
+	public Sprite OnSprite;
+	public Sprite OffSprite;
+	public Sprite MissingBulbSprite;
+	public Sprite BrokenSprite;
+	public Sprite DirtySprite;
+	[Tooltip("Rays effect sprite, which enabled when light is on")]
+	public SpriteRenderer LightFXRenderer;
 
 	[Header("Generates itself if this is null:")]
 	public GameObject mLightRendererObject;
@@ -198,21 +206,29 @@ public class LightSource : ObjectTrigger
 			lightSprites.Color.a = Intensity;
 		}
 	}
-	private void OnStateChange(LightState iValue)
+	private void OnStateChange(LightState newState)
 	{
 		// Assign state appropriate sprite to the LightSourceObject.
-		if (mSpriteDictionary.ContainsKey(iValue))
+		if (mSpriteDictionary.ContainsKey(newState) )
 		{
-			Renderer.sprite = mSpriteDictionary[iValue];
-		}
-		else if (mSpriteDictionary.Any())
-		{
-			Renderer.sprite = mSpriteDictionary.Values.First();
+			var newSprite = mSpriteDictionary[newState];
+			if (newSprite)
+			{
+				Renderer.sprite = newSprite;
+			}
+			else
+			{
+				Logger.LogWarningFormat("{0} lighting missing sprite for an {1} state", Category.Lighting, gameObject.name, newState);
+			}
 		}
 
 		// Switch Light renderer.
 		if (mLightRendererObject != null)
-			mLightRendererObject.SetActive(iValue == LightState.On);
+			mLightRendererObject.SetActive(newState == LightState.On);
+
+		// Switch light FX
+		if (LightFXRenderer != null)
+			LightFXRenderer.gameObject.SetActive(newState == LightState.On);
 	}
 
 	public void PowerLightIntensityUpdate(float Voltage)
@@ -242,9 +258,9 @@ public class LightSource : ObjectTrigger
 			mLightRendererObject = LightSpriteBuilder.BuildDefault(gameObject, new Color(0, 0, 0, 0), 12);
 		}
 
-		State = InitialState;
-
 		ExtractLightSprites();
+
+		State = InitialState;
 
 		GetComponent<Integrity>().OnWillDestroyServer.AddListener(OnWillDestroyServer);
 	}
@@ -294,49 +310,11 @@ public class LightSource : ObjectTrigger
 
 	private void ExtractLightSprites()
 	{
-		// Reimplementation of sprite location on atlas.
-
-		// Note: It is quite magical and really should not be done like this:
-		// It takes an assigned sprite name, parses its index, adds 4 to it and takes resulting sprite from the sheet.
-		// There is a bold assumption that sprite sheets associated with states are spaced 4 indexes between, and that nobody has changed any sprite names.
-		// My reimplementation just grabs more sprites for associated states.
-
-		const int SheetSpacing = 4;
-
-		var _assignedSprite = Renderer.sprite;
-
-		if (_assignedSprite == null)
-		{
-			Logger.LogError("LightSource: Unable to extract light source state sprites from SpriteSheet. Operation requires Renderer.sprite to be assigned in inspector.", Category.Lighting);
-			return;
-		}
-
-		// Try to parse base sprite index.
-		string[] _splitedName = _assignedSprite.name.Split('_');
-		var _spriteSheet = SpriteManager.LightSprites["lights"];
-
-		int _baseIndex;
-		if (_spriteSheet != null && _splitedName.Length == 2 && int.TryParse(_splitedName[1], out _baseIndex))
-		{
-			Func<int, Sprite> ExtractSprite = delegate (int iIndex)
-			{
-				if (iIndex >= 0 && iIndex < _spriteSheet.Length)
-					return _spriteSheet[iIndex];
-
-				return null;
-			};
-
-			// Extract sprites from sprite sheet based on spacing from base index.
-			mSpriteDictionary.Add(LightState.On, _assignedSprite);
-			mSpriteDictionary.Add(LightState.Off, ExtractSprite(_baseIndex + SheetSpacing));
-			mSpriteDictionary.Add(LightState.MissingBulb, ExtractSprite(_baseIndex + (SheetSpacing * 2)));
-			mSpriteDictionary.Add(LightState.Dirty, ExtractSprite(_baseIndex + (SheetSpacing * 3)));
-			mSpriteDictionary.Add(LightState.Broken, ExtractSprite(_baseIndex + (SheetSpacing * 4)));
-		}
-		else
-		{
-			mSpriteDictionary.Add(LightState.On, _assignedSprite);
-		}
+		mSpriteDictionary.Add(LightState.On, OnSprite);
+		mSpriteDictionary.Add(LightState.Off, OffSprite);
+		mSpriteDictionary.Add(LightState.MissingBulb, MissingBulbSprite);
+		mSpriteDictionary.Add(LightState.Dirty, DirtySprite);
+		mSpriteDictionary.Add(LightState.Broken, BrokenSprite);
 	}
 
 	// Handle sync failure.
