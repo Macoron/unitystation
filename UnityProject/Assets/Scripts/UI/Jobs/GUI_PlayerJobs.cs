@@ -44,9 +44,7 @@ public class GUI_PlayerJobs : MonoBehaviour
 			int available = GameManager.Instance.GetOccupationMaxCount(jobType);
 
 			GameObject occupationGO = Instantiate(buttonPrefab, screen_Jobs.transform);
-
-			// This line was added for unit testing - but now it's only rewrite occupations meta
-			//occupation.name = jobType.ToString();
+			occupationGO.name = occupation.JobType.ToString();
 
 			var color = occupation.ChoiceColor;
 

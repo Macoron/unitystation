@@ -27,9 +27,7 @@ namespace Tests
 		{
 			yield return LoadSceneAndSetActive();
 			yield return SkipRoundWaiting();
-			//yield return DoActionWaitSceneLoad(ClickButton("StartGameButton"));
-			//yield return ClickButton("Nanotrasen");
-			//yield return ClickButton(JobType.CHIEF_ENGINEER);
+			yield return ClickButton("CHIEF_ENGINEER");
 
 			yield return Settle();
 
