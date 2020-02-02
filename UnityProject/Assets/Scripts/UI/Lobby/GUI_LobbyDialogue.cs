@@ -82,8 +82,17 @@ namespace Lobby
 
 		private void Update()
 		{
-			//login skip only allowed (and only works properly) in offline mode
-			if (Input.GetKeyDown(KeyCode.F6) && GameData.Instance.OfflineMode)
+			//
+			if (Input.GetKeyDown(KeyCode.F6))
+				OfflineSkipLogin();
+		}
+
+		/// <summary>
+		/// Login skip only allowed (and only works properly) in offline mode
+		/// </summary>
+		public void OfflineSkipLogin()
+		{
+			if (GameData.Instance.OfflineMode)
 			{
 				//skip login
 				HideAllPanels();

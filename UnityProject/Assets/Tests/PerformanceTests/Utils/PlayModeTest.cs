@@ -161,15 +161,46 @@ namespace Tests
 			float currentRetrySecs = passedRetrySeconds;
 			while (currentRetrySecs <= RetrySeconds)
 			{
-				var preRoundWindowGO = GameObject.Find("PreRoundWindow");
-				if (preRoundWindowGO)
+				var preRoundWindow = GameObject.FindObjectOfType<GUI_PreRoundWindow>();
+				if (preRoundWindow)
 				{
-					var preRoundWindow = preRoundWindowGO.GetComponent<GUI_PreRoundWindow>();
-					if (!preRoundWindow)
-						throw new Exception("PreRoundWindow doesn't contain GUI_PreRoundWindow component");
-
 					preRoundWindow.StartNowButton();
 					Logger.Log("Skipped round waiting", Category.Tests);
+					yield break;
+				}
+
+				yield return null;
+				currentRetrySecs += Time.fixedDeltaTime;
+			}
+			throw new TimeoutException("Retry period exceeded");
+		}
+
+		protected IEnumerator SkipLogin(float passedRetrySeconds = 0)
+		{
+			Logger.Log("Trying to set game in offline gamemode", Category.Tests);
+			var gameData = GameObject.FindObjectOfType<GameData>();
+			if (!gameData)
+				throw new Exception("Can't find GameData in scene");
+
+			// need to go with reflection for that one
+			var prop = gameData.GetType().GetField("offlineMode", System.Reflection.BindingFlags.NonPublic
+				| System.Reflection.BindingFlags.Instance);
+			prop.SetValue(gameData, true);
+
+			if (!gameData.OfflineMode)
+				throw new Exception("Failed to set GameData.Offline mode to true");
+
+			Logger.Log("Set game in offline gamemode", Category.Tests);
+
+			Logger.Log("Trying to skip login", Category.Tests);
+			float currentRetrySecs = passedRetrySeconds;
+			while (currentRetrySecs <= RetrySeconds)
+			{
+				var lobbyDialogue = GameObject.FindObjectOfType<Lobby.GUI_LobbyDialogue>();
+				if (lobbyDialogue)
+				{
+					lobbyDialogue.OfflineSkipLogin();
+					Logger.Log("Skipped login", Category.Tests);
 					yield break;
 				}
 

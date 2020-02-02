@@ -40,10 +40,12 @@ namespace Tests
 			yield return LoadSceneAndSetActive();
 			LoadTime();
 
-			yield return ClickButton("LoginButton");
+			yield return SkipLogin();
+
 			yield return DoActionWaitSceneLoad(ClickButton("StartGameButton"));
-			yield return ClickButton("Nanotrasen");
-			yield return ClickButton(JobType.ASSISTANT);
+			yield return SkipRoundWaiting();
+			yield return ClickButton("ASSISTANT");
+
 			OutpostTime();
 
 			yield return Settle();
@@ -58,7 +60,8 @@ namespace Tests
 			EndBenchmark();
 		}
 
-		[UnityTest, Performance]
+		// This test is legacy now
+		/*[UnityTest, Performance]
 		public IEnumerator NukeOps()
 		{
 			StartTime();
@@ -79,7 +82,7 @@ namespace Tests
 			yield return DoActionWaitSceneUnload(ClickButton("Button1"));
 
 			EndBenchmark();
-		}
+		}*/
 		#endregion
 
 		protected override IEnumerator CustomUpdateBenchmark(int sampleCount)
