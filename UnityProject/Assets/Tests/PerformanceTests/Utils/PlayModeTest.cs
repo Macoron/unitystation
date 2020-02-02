@@ -155,6 +155,30 @@ namespace Tests
 			throw new TimeoutException("Retry period exceeded");
 		}
 
+		protected IEnumerator SkipRoundWaiting(float passedRetrySeconds = 0)
+		{
+			Logger.Log("Trying to skip round waiting", Category.Tests);
+			float currentRetrySecs = passedRetrySeconds;
+			while (currentRetrySecs <= RetrySeconds)
+			{
+				var preRoundWindowGO = GameObject.Find("PreRoundWindow");
+				if (preRoundWindowGO)
+				{
+					var preRoundWindow = preRoundWindowGO.GetComponent<GUI_PreRoundWindow>();
+					if (!preRoundWindow)
+						throw new Exception("PreRoundWindow doesn't contain GUI_PreRoundWindow component");
+
+					preRoundWindow.StartNowButton();
+					Logger.Log("Skipped round waiting", Category.Tests);
+					yield break;
+				}
+
+				yield return null;
+				currentRetrySecs += Time.fixedDeltaTime;
+			}
+			throw new TimeoutException("Retry period exceeded");
+		}
+
 		protected void ListButtons()
 		{
 			var sb = new StringBuilder();

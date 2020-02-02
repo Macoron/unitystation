@@ -11,7 +11,7 @@ namespace Tests
 {
     class ElectricityTest : PlayModePerformanceTest
 	{
-		protected override string Scene => "Lobby";
+		protected override string Scene => "OutpostStation";
 
 		protected override SampleGroupDefinition[] SampleGroupDefinitions => sampleGroupDefinitions;
 
@@ -26,10 +26,10 @@ namespace Tests
         public IEnumerator ElectricityGeneratorTest()
 		{
 			yield return LoadSceneAndSetActive();
-			yield return ClickButton("LoginButton");
-			yield return DoActionWaitSceneLoad(ClickButton("StartGameButton"));
-			yield return ClickButton("Nanotrasen");
-			yield return ClickButton(JobType.CHIEF_ENGINEER);
+			yield return SkipRoundWaiting();
+			//yield return DoActionWaitSceneLoad(ClickButton("StartGameButton"));
+			//yield return ClickButton("Nanotrasen");
+			//yield return ClickButton(JobType.CHIEF_ENGINEER);
 
 			yield return Settle();
 
