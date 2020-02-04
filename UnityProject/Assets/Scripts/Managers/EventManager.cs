@@ -74,6 +74,13 @@ public class EventManager : MonoBehaviour
 
 	public static void RemoveHandler(EVENT evnt, Action action)
 	{
+		if (!eventTable.ContainsKey(evnt))
+		{
+			Logger.LogWarning($"Can't find {evnt} in event table", Category.UI);
+			return;
+		}
+
+
 		if (eventTable[evnt] != null)
 		{
 			eventTable[evnt] -= action;
