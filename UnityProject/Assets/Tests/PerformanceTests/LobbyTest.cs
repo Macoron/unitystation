@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Unity.PerformanceTesting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.TestTools;
@@ -36,6 +37,26 @@ namespace Tests
 		[UnityTest, Performance]
 		public IEnumerator NanotrasenAssistant()
 		{
+			yield return null;
+
+			/*var mainScene = EditorSceneManager.OpenScene("Assets/Scenes/OutpostStation.unity", OpenSceneMode.Single);
+
+			yield return new EnterPlayMode();
+
+			yield return EditorRoutine.Execute(SkipRoundWaiting());
+
+			yield return EditorRoutine.Execute(ClickButton(JobType.ASSISTANT.ToString()));
+
+			yield return EditorRoutine.Execute(Settle());
+
+			yield return new ExitPlayMode();*/
+
+			/*yield return new WaitForSeconds(20);
+
+			yield return new EnterPlayMode();
+
+
+
 			StartTime();
 			yield return LoadSceneAndSetActive();
 			LoadTime();
@@ -58,6 +79,8 @@ namespace Tests
 			yield return DoActionWaitSceneUnload(ClickButton("Button1"));
 
 			EndBenchmark();
+
+			yield return new ExitPlayMode();*/
 		}
 
 		// This test is legacy now

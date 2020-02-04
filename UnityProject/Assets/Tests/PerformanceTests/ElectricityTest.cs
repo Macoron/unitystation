@@ -4,11 +4,61 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.PerformanceTesting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 namespace Tests
 {
+	public static class EditorRoutine
+	{
+		private class EditorRoutineBehaviour : MonoBehaviour { }
+
+		private static EditorRoutineBehaviour instance;
+		private static EditorRoutineBehaviour Instance
+		{
+			get
+			{
+				if (!instance)
+				{
+					var routineHost = new GameObject();
+					instance = routineHost.AddComponent<EditorRoutineBehaviour>();
+				}
+
+				return instance;
+
+			}
+		}
+
+		public static bool isComplete = true;
+
+		public static IEnumerator Execute(IEnumerator basicRoutine)
+		{
+			if (!isComplete)
+				throw new Exception("Editor already executing another routine!");
+			isComplete = false;
+
+			Instance.StartCoroutine(RoutineWrapper(basicRoutine));
+
+			while (!isComplete)
+			{
+				if (!Application.isPlaying)
+					break;
+
+				yield return null;
+			}
+
+		}
+
+		private static IEnumerator RoutineWrapper(IEnumerator basicRoutine)
+		{
+			yield return basicRoutine;
+			isComplete = true;
+		}
+
+	}
+
     class ElectricityTest : PlayModePerformanceTest
 	{
 		protected override string Scene => "OutpostStation";
@@ -22,11 +72,52 @@ namespace Tests
 
 		PlayerSync player;
 
+		/*[UnitySetUp]
+		private IEnumerator Setup()
+		{
+			for (int i = 0; i < SceneManager.sceneCount; i++)
+			{
+				var scene = SceneManager.GetSceneAt(i);
+				if (scene != SceneManager.GetActiveScene())
+					yield return SceneManager.UnloadSceneAsync(scene);
+			}
+		}*/
+
+		[UnityTest, Performance]
+		public IEnumerator NanotrasenAssistantTest()
+		{
+			var mainScene = EditorSceneManager.OpenScene("Assets/Scenes/OutpostStation.unity", OpenSceneMode.Single);
+
+			yield return new EnterPlayMode();
+
+			yield return EditorRoutine.Execute(SkipRoundWaiting());
+
+			yield return EditorRoutine.Execute(ClickButton(JobType.ASSISTANT.ToString()));
+
+			yield return EditorRoutine.Execute(Settle());
+
+			yield return new ExitPlayMode();
+		}
+
 		[UnityTest, Performance]
         public IEnumerator ElectricityGeneratorTest()
 		{
-			yield return LoadSceneAndSetActive();
-			yield return SkipRoundWaiting();
+			//var testScene = SceneManager.CreateScene("TestRunner");
+			//SceneManager.SetActiveScene(testScene);
+
+			var mainScene = EditorSceneManager.OpenScene("Assets/Scenes/OutpostStation.unity", OpenSceneMode.Single);
+
+			yield return new EnterPlayMode();
+
+			yield return EditorRoutine.Execute(SkipRoundWaiting());
+
+			yield return EditorRoutine.Execute(ClickButton("CHIEF_ENGINEER"));
+
+			yield return EditorRoutine.Execute(Settle());
+
+			yield return new ExitPlayMode();
+
+			/*yield return new ConditionalRoutine(SkipRoundWaiting()).MainRoutine();
 			yield return ClickButton("CHIEF_ENGINEER");
 
 			yield return Settle();
@@ -39,10 +130,34 @@ namespace Tests
 			yield return Settle();
 			yield return UpdateBenchmark(300);
 
-			GUI_IngameMenu.Instance.isTest = true;
+			yield return new ExitPlayMode();
+
+			/*GUI_IngameMenu.Instance.isTest = true;
 			GUI_IngameMenu.Instance.OpenMenuPanel();
 			yield return ClickButton("ExitButton");
-			yield return DoActionWaitSceneUnload(ClickButton("Button1"));
+			yield return DoActionWaitSceneUnload(ClickButton("Button1"));*/
+
+			//yield return new WaitForSeconds(20);
+
+			/*var testScene = SceneManager.GetSceneAt(0);
+			SceneManager.SetActiveScene(testScene);
+
+			//yield return new WaitForSeconds(5);
+
+			for (int i = 0; i < SceneManager.sceneCount; i++)
+			{
+				var scene = SceneManager.GetSceneAt(i);
+				if (scene != testScene)
+					yield return SceneManager.UnloadSceneAsync(scene);
+			}
+
+			var go = new GameObject("Sacrificial Lamb");
+			GameObject.DontDestroyOnLoad(go);
+
+			foreach (var root in go.scene.GetRootGameObjects())
+				GameObject.Destroy(root);*/
+
+			//yield return new WaitForSeconds(20);
 		}
 
 		protected override IEnumerator CustomUpdateBenchmark(int sampleCount)

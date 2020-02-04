@@ -23,6 +23,7 @@ namespace Tests
 
 		protected IEnumerator LoadSceneAndSetActive(string sceneName)
 		{
+
 			yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 			SetActiveScene(sceneName);
 		}
