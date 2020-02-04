@@ -95,6 +95,13 @@ jobs:
           license="${license//$'\n'/'%0A'}"
           license="${license//$'\r'/'%0D'}"
           echo "::set-env name=UNITY_LICENSE::$license"
+      # Test
+      - name: Run tests
+        uses: webbertakken/unity-test-runner@v1.3
+        with:
+          unityVersion: 2019.2.11f1
+
+      
       # Build the project
       - name: Build project
         uses: webbertakken/unity-builder@v0.9
