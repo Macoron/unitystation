@@ -7,14 +7,11 @@ namespace Tests
 	abstract class PlayModePerformanceTest : PlayModeTest
 	{
 		protected const int DefaultSamples = 100;
-		protected float SettleSeconds = 2;
 
 		protected const string FpsName = "FPS";
 		protected const string TotalMemoryName = "TotalAllocatedMemory";
 
 		protected abstract SampleGroupDefinition[] SampleGroupDefinitions { get; }
-
-		protected WaitForSecondsRealtime Settle() => WaitFor.SecondsRealtime(SettleSeconds);
 
 		protected IEnumerator UpdateBenchmark(int sampleCount = DefaultSamples)
 		{

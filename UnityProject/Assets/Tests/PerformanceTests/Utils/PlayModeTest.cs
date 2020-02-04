@@ -13,27 +13,15 @@ namespace Tests
 	{
 		protected float RetrySeconds = 3;
 
-		protected abstract string Scene { get; }
-
-		#region Scene Methods
-		protected IEnumerator LoadSceneAndSetActive()
+		protected IEnumerator PlayMode(IEnumerator coroutine)
 		{
-			return LoadSceneAndSetActive(Scene);
+			yield return EditorRoutine.Execute(coroutine);
 		}
 
-		protected IEnumerator LoadSceneAndSetActive(string sceneName)
+		protected IEnumerator PlayMode(YieldInstruction instruction)
 		{
-
-			yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-			SetActiveScene(sceneName);
+			yield return EditorRoutine.Execute(instruction);
 		}
-
-		protected void SetActiveScene(string sceneName)
-		{
-			var scene = SceneManager.GetSceneByName(sceneName);
-			SceneManager.SetActiveScene(scene);
-		}
-		#endregion
 
 		#region Button Methods
 		protected IEnumerator DoActionWaitSceneLoad(Action action)
@@ -226,5 +214,9 @@ namespace Tests
 			Logger.Log(sb.ToString(), Category.Tests);
 		}
 		#endregion
+
+		protected float SettleSeconds = 2;
+
+		protected WaitForSecondsRealtime Settle() => WaitFor.SecondsRealtime(SettleSeconds);
 	}
 }
