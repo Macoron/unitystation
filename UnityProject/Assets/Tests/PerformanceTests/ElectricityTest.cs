@@ -11,54 +11,6 @@ using UnityEngine.TestTools;
 
 namespace Tests
 {
-	public static class EditorRoutine
-	{
-		private class EditorRoutineBehaviour : MonoBehaviour { }
-
-		private static EditorRoutineBehaviour instance;
-		private static EditorRoutineBehaviour Instance
-		{
-			get
-			{
-				if (!instance)
-				{
-					var routineHost = new GameObject();
-					instance = routineHost.AddComponent<EditorRoutineBehaviour>();
-				}
-
-				return instance;
-
-			}
-		}
-
-		public static bool isComplete = true;
-
-		public static IEnumerator Execute(IEnumerator basicRoutine)
-		{
-			if (!isComplete)
-				throw new Exception("Editor already executing another routine!");
-			isComplete = false;
-
-			Instance.StartCoroutine(RoutineWrapper(basicRoutine));
-
-			while (!isComplete)
-			{
-				if (!Application.isPlaying)
-					break;
-
-				yield return null;
-			}
-
-		}
-
-		private static IEnumerator RoutineWrapper(IEnumerator basicRoutine)
-		{
-			yield return basicRoutine;
-			isComplete = true;
-		}
-
-	}
-
     class ElectricityTest : PlayModePerformanceTest
 	{
 		protected override string Scene => "OutpostStation";
