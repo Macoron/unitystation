@@ -34,6 +34,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2.0.0
 
+      # Set the UNITY_LICENSE environment variable
+      - name: Setup license
+        # This step:
+        #   - Grabs the license file contents from the $LICENSE_FILE_PATH
+        #   - Uses substitution to escape newline characters for GitHub Actions set-env.
+        #     (from: https://github.community/t5/GitHub-Actions/set-output-Truncates-Multiline-Strings/td-p/37870)
+        #   - Set the UNITY_LICENSE env var for all future steps using special GitHub Actions syntax
+        run: |
+          setx UNITY_LICENSE "\Tools\UnityLicense.ulf"
+          
       # Cache the library directory to speed up builds
       - name: Cache library directory
         uses: actions/cache@v1.1.0
@@ -44,18 +54,6 @@ jobs:
             Library-${{ matrix.projectPath }}-${{ matrix.targetPlatform }}
             Library-${{ matrix.projectPath }}-
             Library-
-
-      # Set the UNITY_LICENSE environment variable
-      - name: Setup license
-        # This step:
-        #   - Grabs the license file contents from the $LICENSE_FILE_PATH
-        #   - Uses substitution to escape newline characters for GitHub Actions set-env.
-        #     (from: https://github.community/t5/GitHub-Actions/set-output-Truncates-Multiline-Strings/td-p/37870)
-        #   - Set the UNITY_LICENSE env var for all future steps using special GitHub Actions syntax
-        env:
-          LICENSE_FILE_PATH: .\Tools\UnityLicense.ulf
-        run: |
-          setx UNITY_LICENSE "$LICENSE_FILE_PATH"
       # Test
       - name: Run tests
         uses: webbertakken/unity-test-runner@v1.3
