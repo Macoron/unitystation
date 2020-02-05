@@ -55,6 +55,10 @@ jobs:
         env:
           LICENSE_FILE_PATH: ./Tools/UnityLicense.ulf
         run: |
+          license=$(<"$LICENSE_FILE_PATH")
+          license="${license//'%'/'%25'}"
+          license="${license//$'\n'/'%0A'}"
+          license="${license//$'\r'/'%0D'}"
           setx UNITY_LICENSE "$LICENSE_FILE_PATH"
       # Test
       - name: Run tests
