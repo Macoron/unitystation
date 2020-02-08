@@ -531,7 +531,7 @@ public partial class Chat
 		{
 			// it's a common message!
 			extractedChanel = ChatChannel.Common;
-			specialCharCount++;
+			specialCharCount = 1;
 		}
 		else if (firstLetter == '.' || firstLetter == ':')
 		{
@@ -543,7 +543,7 @@ public partial class Chat
 				if (ChanelsTags.ContainsKey(secondLetter))
 				{
 					extractedChanel = ChanelsTags[secondLetter];
-					specialCharCount++;
+					specialCharCount = 2;
 				}
 				else if (secondLetter == 'h')
 				{
@@ -558,11 +558,9 @@ public partial class Chat
 						extractedChanel = ChatChannel.None;
 					}
 
-					specialCharCount++;
+					specialCharCount = 2;
 				}
 			}
-
-			specialCharCount++;
 		}
 
 		// delete all special chars

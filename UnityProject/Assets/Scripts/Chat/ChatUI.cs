@@ -841,7 +841,7 @@ public class ChatUI : MonoBehaviour
 				if (availChannels.HasFlag(inputChannel))
 				{
 					// select extracted channel and deselect all others
-					DisableAllChanels();
+					//DisableAllChanels();
 					EnableChannel(inputChannel);
 
 					prevTagSelectedChannel = inputChannel;
@@ -855,7 +855,7 @@ public class ChatUI : MonoBehaviour
 			}
 
 		}
-		else 
+		/*else 
 		{
 			if (prevTagSelectedChannel != ChatChannel.None)
 			{
@@ -863,7 +863,8 @@ public class ChatUI : MonoBehaviour
 				DisableChannel(prevTagSelectedChannel);
 				prevTagSelectedChannel = ChatChannel.None;
 			}
-		}
+		}*/
 
+		InputFieldChat.text = parsedInput.ClearMessage;
 	}
 }
