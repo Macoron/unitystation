@@ -100,6 +100,7 @@ jobs:
           echo "::set-env name=UNITY_LICENSE::$license"
       # Run tests - only edit mode supported
       - name: Run tests
+        id: testRunner
         uses: webbertakken/unity-test-runner@v1.3
         with:
           projectPath: ${{ matrix.projectPath }}
