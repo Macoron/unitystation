@@ -98,6 +98,19 @@ jobs:
           license="${license//$'\n'/'%0A'}"
           license="${license//$'\r'/'%0D'}"
           echo "::set-env name=UNITY_LICENSE::$license"
+      # Run tests - only edit mode supported
+      - name: Run tests
+        uses: webbertakken/unity-test-runner@v1.3
+        with:
+          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: editmode
+      # Upload test results
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v1
+        with:
+          name: Test results
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
       # Build the project
       - name: Build project
         uses: webbertakken/unity-builder@v0.9
