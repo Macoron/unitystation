@@ -116,11 +116,14 @@ jobs:
       # Send it to Check Run Reporter
       - name: Make Check Run Reporter
         if: always()
-        uses: check-run-reporter/actions@master
-        with:
-          CHECK_RUN_REPORTER_REPO_TOKEN: ${{ secrets.CHECK_RUN_REPORTER_REPO_TOKEN }}
-          CHECK_RUN_REPORTER_LABEL: ${{ matrix.targetPlatform }}
-          CHECK_RUN_REPORTER_REPORT_GLOB: ./testReports/${{ matrix.targetPlatform }}/*.xml
+        run: |
+          curl "https://api.check-run-reporter.com/api/v1/submissions" \
+          --user token:${{ secrets.CHECK_RUN_REPORTER_REPO_TOKEN }} \
+          -X POST \
+          -F report=@"./testReports/${{ matrix.targetPlatform }}/editmode-results.xml" \
+          -F label="${{ matrix.targetPlatform }}" \
+          -F sha="${{ github.sha }}" \
+          -F root="$(pwd)"
       # Build the project
       - name: Build project
         uses: webbertakken/unity-builder@v0.9
