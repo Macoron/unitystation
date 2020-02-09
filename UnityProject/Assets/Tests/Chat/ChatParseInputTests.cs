@@ -52,6 +52,8 @@ namespace Tests
 		[Test]
 		public void TestAllChannelsTag()
 		{
+			throw new System.Exception("Stupid exception");
+
 			foreach (var pair in Chat.ChanelsTags)
 			{
 				var msg = string.Format(":{0} Testing!", pair.Key);
