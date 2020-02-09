@@ -100,11 +100,11 @@ jobs:
           echo "::set-env name=UNITY_LICENSE::$license"
       # Run tests - only edit mode supported
       - name: Run tests
-        id: testRunner
         uses: webbertakken/unity-test-runner@v1.3
         with:
           projectPath: ${{ matrix.projectPath }}
           unityVersion: ${{ matrix.unityVersion }}
+          artifactsPath: ./testReports/${{ matrix.targetPlatform }}
           testMode: editmode
       # Upload test results
       - name: Upload Test Results
@@ -112,7 +112,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: Test results
-          path: ${{ steps.testRunner.outputs.artifactsPath }}
+          path: ./testReports/${{ matrix.targetPlatform }}
       # Build the project
       - name: Build project
         uses: webbertakken/unity-builder@v0.9
