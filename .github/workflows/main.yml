@@ -108,6 +108,7 @@ jobs:
           testMode: editmode
       # Upload test results
       - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v1
         with:
           name: Test results
