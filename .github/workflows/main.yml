@@ -1,4 +1,4 @@
-name: Build Project
+name: Unitystation CI
 
 on:
   push:
@@ -111,13 +111,18 @@ jobs:
         with:
           name: Test results
           path: ./testReports/${{ matrix.targetPlatform }}
+      # Copy editor log file
+      - name: Get editor test file
+        if: always()
+        run: |
+          cp ~/.config/unity3d/Editor.log ./     
       # Upload editor log
       - name: Upload Editor log
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v1
         with:
           name: Editor Log
-          path: ~/.config/unity3d/Editor.log
+          path: 
 
   # Perform build job
   performBuild:
