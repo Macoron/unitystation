@@ -54,7 +54,7 @@ jobs:
   
   # Perform unit testing
   performTest:
-    name: Test for ${{ matrix.targetPlatform }} on version ${{ matrix.unityVersion }}
+    name: Unit testing on ${{ matrix.unityVersion }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -111,18 +111,6 @@ jobs:
         with:
           name: Test results
           path: ./testReports/${{ matrix.targetPlatform }}
-      # Copy editor log file
-      - name: Get editor test file
-        if: always()
-        run: |
-          cp ~/.config/unity3d/Editor.log ./     
-      # Upload editor log
-      - name: Upload Editor log
-        if: success()
-        uses: actions/upload-artifact@v1
-        with:
-          name: Editor Log
-          path: 
 
   # Perform build job
   performBuild:
