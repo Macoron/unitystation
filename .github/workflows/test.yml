@@ -104,6 +104,19 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}
           artifactsPath: ./testReports/${{ matrix.targetPlatform }}
           testMode: editmode
+          
+      # Install dotnet
+      - name: Installing dotnet
+        if: always()
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '2.1.202'
+          
+      # Do the report magic
+      - name: Generate .html report
+        run: sudo dotnet ./Tools/ExtentReports/ExtentReportsDotNetCLI.dll -i=testReports/${{ matrix.targetPlatform }}/editmode-results.xml -o testReports/${{ matrix.targetPlatform }}/
+        if: success()
+        
       # Upload test results
       - name: Upload Test Results
         if: always()
