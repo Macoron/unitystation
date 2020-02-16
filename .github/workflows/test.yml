@@ -17,7 +17,7 @@ on:
     paths:
     - 'Tools/UnityLicense.ulf'
     - 'UnityProject/**'
-    - '.github/workflows/main.yml'
+    - '.github/workflows/**'
 
 jobs:
 
