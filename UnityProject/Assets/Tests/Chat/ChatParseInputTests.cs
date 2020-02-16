@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
@@ -44,6 +44,7 @@ namespace Tests
 		[TestCaseSource(nameof(InputTestCases))]
         public void CheckChannelAndClearMessage(string rawMsg, ChatChannel expectedChannel, string clearMsg)
         {
+            Debug.LogError("Broken test!");
 			var parsedInfo = Chat.ParsePlayerInput(rawMsg, context);
 			Assert.AreEqual(parsedInfo.ParsedChannel, expectedChannel);
 			Assert.AreEqual(parsedInfo.ClearMessage, clearMsg);
