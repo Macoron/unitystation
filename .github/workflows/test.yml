@@ -98,7 +98,7 @@ jobs:
           echo "::set-env name=UNITY_LICENSE::$license"
       # Run tests - only edit mode supported
       - name: Run tests
-        uses: webbertakken/unity-test-runner@v1.3
+        uses: webbertakken/unity-test-runner@v1.5
         with:
           projectPath: ${{ matrix.projectPath }}
           unityVersion: ${{ matrix.unityVersion }}
@@ -115,7 +115,7 @@ jobs:
       # Do the report magic
       - name: Generate .html report
         run: sudo dotnet ./Tools/ExtentReports/ExtentReportsDotNetCLI.dll -i=testReports/${{ matrix.targetPlatform }}/editmode-results.xml -o testReports/${{ matrix.targetPlatform }}/
-        if: success()
+        if: always()
         
       # Upload test results
       - name: Upload Test Results
