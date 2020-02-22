@@ -1,5 +1,5 @@
 # unitystation
-![Build Project](https://github.com/unitystation/unitystation/workflows/Build%20Project/badge.svg?branch=develop)
+![Tests](https://github.com/unitystation/unitystation/workflows/Tests/badge.svg)![Build Project](https://github.com/unitystation/unitystation/workflows/Build%20Project/badge.svg?branch=develop)
 [![GitHub last commit](https://img.shields.io/github/last-commit/unitystation/unitystation.svg)](https://github.com/unitystation/unitystation/commits/develop) [![Krihelimeter](http://www.krihelinator.xyz/badge/unitystation/unitystation)](http://www.krihelinator.xyz/repositories/unitystation/unitystation) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 <br>
 ![built-with-resentment](http://forthebadge.com/images/badges/built-with-resentment.svg) ![contains-technical-debt](http://forthebadge.com/images/badges/contains-technical-debt.svg)<br />
@@ -19,7 +19,7 @@ Please join us on Discord:<br>
 ## Feel like getting involved?
 Read our Quick Start guide [here](https://github.com/unitystation/unitystation/wiki/Starting-contribution)
 1. [Get Unity Hub](https://unity3d.com/get-unity/download)
-2. Install editor version 2019.2.11
+2. Install editor version **2019.2.19** (NOT 2019.3!)
 3. Fork the repo
 4. Add your changes
 5. Read the contribution guidelines

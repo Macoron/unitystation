@@ -61,10 +61,22 @@ public class Welder : NetworkBehaviour, IInteractable<HandActivate>, IServerSpaw
 
 	void Awake()
 	{
+		EnsureInit();
+	}
+
+	private void EnsureInit()
+	{
+		if (pickupable != null) return;
+
 		pickupable = GetComponent<Pickupable>();
-		reagentContainer = GetComponent<ReagentContainer>();
 		itemAtts = GetComponent<ItemAttributesV2>();
 		registerTile = GetComponent<RegisterTile>();
+
+		reagentContainer = GetComponent<ReagentContainer>();
+		if (reagentContainer != null)
+		{
+			reagentContainer.OnSpillAllContents.AddListener(ServerEmptyWelder);
+		}
 
 		damageOff = itemAtts.ServerHitDamage;
 
@@ -77,12 +89,13 @@ public class Welder : NetworkBehaviour, IInteractable<HandActivate>, IServerSpaw
 
 	public override void OnStartClient()
 	{
-		SyncIsOn(isOn);
+		EnsureInit();
+		SyncIsOn(isOn, isOn);
 	}
 
 	public void OnSpawnServer(SpawnInfo info)
 	{
-		SyncIsOn(false);
+		SyncIsOn(isOn, false);
 	}
 
 	public void ServerPerformInteraction(HandActivate interaction)
@@ -91,13 +104,20 @@ public class Welder : NetworkBehaviour, IInteractable<HandActivate>, IServerSpaw
 	}
 
 	[Server]
-	public void ServerToggleWelder(GameObject originator)
+	public void ServerEmptyWelder()
 	{
-		SyncIsOn(!isOn);
+		SyncIsOn(isOn, false);
 	}
 
-	private void SyncIsOn(bool _isOn)
+	[Server]
+	public void ServerToggleWelder(GameObject originator)
 	{
+		SyncIsOn(isOn, !isOn);
+	}
+
+	private void SyncIsOn(bool _wasOn, bool _isOn)
+	{
+		EnsureInit();
 		if (isServer)
 		{
 			if (FuelAmount <= 0f)
@@ -190,7 +210,7 @@ public class Welder : NetworkBehaviour, IInteractable<HandActivate>, IServerSpaw
 				//Ran out of fuel
 				if (FuelAmount < 0f)
 				{
-					SyncIsOn(false);
+					SyncIsOn(isOn, false);
 				}
 
 				Vector2Int position = gameObject.TileWorldPosition();
@@ -201,5 +221,4 @@ public class Welder : NetworkBehaviour, IInteractable<HandActivate>, IServerSpaw
 			yield return WaitFor.Seconds(.1f);
 		}
 	}
-
 }

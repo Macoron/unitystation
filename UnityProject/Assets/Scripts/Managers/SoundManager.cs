@@ -41,14 +41,16 @@ public class SoundManager : MonoBehaviour
 		{FloorSound.plating,
 			 new List<string> {"plating1","plating2","plating3","plating4", "plating5" }},
 		{FloorSound.wood,
-			 new List<string> {"wood1","wood2","wood3","wood4", "wood5" }}
+			 new List<string> {"wood1","wood2","wood3","wood4", "wood5" }},
+		{FloorSound.clownstep,
+			 new List<string> {"clownstep1","clownstep2" }},
 	};
 
 	private static bool Step;
 	private bool isMusicMute;
 
 	private List<AudioSource> ambientTracks = new List<AudioSource>();
-	public AudioSource ambientTrack => ambientTracks[0];
+	public AudioSource ambientTrack;
 
 	// Use this for initialization
 	//public AudioSource[] sounds;
@@ -76,6 +78,19 @@ public class SoundManager : MonoBehaviour
 
 	[Range(0f, 1f)]
 	public float MusicVolume = 1;
+
+	[SerializeField]
+	private string[] RoundEndSounds = new string[]
+	{
+		"ApcDestroyed",
+		"BanginDonk",
+		"Disappointed",
+		"ItsOnlyGame",
+		"LeavingTG",
+		"NewRoundSexy",
+		"Scrunglartiy",
+		"Yeehaw"
+	};
 
 	public AudioSource this[string key]
 	{
@@ -397,7 +412,7 @@ public class SoundManager : MonoBehaviour
 			var trackerMusic = new[]
 			{
 				"Spaceman_HERB.xm",
-				"Echo sound.xm",
+				"Echo sound_4mat.xm",
 				"Tintin on the Moon_Jeroen Tel.xm"
 			};
 			var songPicked = trackerMusic.Wrap(Random.Range(1, 100));
@@ -434,13 +449,31 @@ public class SoundManager : MonoBehaviour
 		}
 	}
 
-	public static void PlayAmbience()
+	public static void PlayAmbience(string ambientTrackName)
 	{
-		//Station hum
-		Instance.ambientTrack.Play();
+		void PlayAmbientTrack(AudioSource track)
+		{
+			Logger.Log($"Playing ambient track: {track.name}", Category.SoundFX);
+			Instance.ambientTrack = track;
+			//Ambient Volume
+			if (PlayerPrefs.HasKey("AmbientVol"))
+			{
+				track.volume = Mathf.Clamp(PlayerPrefs.GetFloat("AmbientVol"),0f,0.25f);
+			}
+			track.Play();
+		}
 
-		//Random introduction sound
-		Play("Ambient#");
+		foreach (var track in Instance.ambientTracks)
+		{
+			if (track.name == ambientTrackName)
+			{
+				PlayAmbientTrack(track);
+			}
+			else
+			{
+				track.Stop();
+			}
+		}
 	}
 
 	/// <summary>
@@ -449,6 +482,7 @@ public class SoundManager : MonoBehaviour
 	/// <param name="volume"></param>
 	public static void AmbientVolume(float volume)
 	{
+		volume = Mathf.Clamp(volume, 0f, 0.25f);
 		foreach (AudioSource s in Instance.ambientTracks)
 		{
 			s.volume = volume;
@@ -476,6 +510,15 @@ public class SoundManager : MonoBehaviour
 		return  RANDOM.NextDouble() * (maximum - minimum) + minimum;
 	}
 
+	/// <summary>
+	/// Plays a random round end sound using sounds picked from RoundEndSounds
+	/// </summary>
+	public void PlayRandomRoundEndSound()
+	{
+		var rand = RANDOM.Next(RoundEndSounds.Length);
+		PlayNetworked(RoundEndSounds[rand], 1f);
+	}
+
 }
 
 public enum FloorSound
@@ -488,6 +531,5 @@ public enum FloorSound
 	lava,
 	plating,
 	wood,
-
-
+	clownstep,
 }

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -99,6 +98,11 @@ public class RequestInteractMessage : ClientMessage
 	public override IEnumerator Process()
 	{
 		var performer = SentByPlayer.GameObject;
+
+		if (SentByPlayer == null || SentByPlayer.Script == null || SentByPlayer.Script.ItemStorage == null)
+		{
+			yield break;
+		}
 
 		if (InteractionType == typeof(PositionalHandApply))
 		{
@@ -201,8 +205,12 @@ public class RequestInteractMessage : ClientMessage
 	private void ProcessInteraction<T>(T interaction, GameObject processorObj)
 		where T : Interaction
 	{
+		if (processorObj == null)
+		{
+			Logger.LogWarning("processorObj is null, action will not be performed.", Category.Interaction);
+			return;
+		}
 		//find the indicated component
-		var success = false;
 		var component = processorObj.GetComponent(ComponentType);
 		if (component == null)
 		{

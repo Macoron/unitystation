@@ -20,8 +20,33 @@ public class EscapeShuttle : NetworkBehaviour
 	public ShuttleStatusEvent OnShuttleUpdate = new ShuttleStatusEvent();
 	public ShuttleTimerEvent OnTimerUpdate = new ShuttleTimerEvent();
 
-	public Destination CentcomDest = new Destination {Orientation = Orientation.Right, Position = new Vector2( 150, 6 ), ApproachReversed = false};
-	public Destination StationDest = new Destination {Orientation = Orientation.Right, Position = new Vector2( 49, 6 ), ApproachReversed = true};
+
+	void Start()
+	{
+		if (OrientationRight == true)
+		{
+			CentcomDest = new Destination { Orientation = Orientation.Right, Position = DockingLocationCentcom, ApproachReversed = false };
+			StationDest = new Destination { Orientation = Orientation.Right, Position = DockingLocationStation, ApproachReversed = true };
+		}
+		else if (OrientationUp == true)
+		{
+			CentcomDest = new Destination { Orientation = Orientation.Up, Position = DockingLocationCentcom, ApproachReversed = false };
+			StationDest = new Destination { Orientation = Orientation.Up, Position = DockingLocationStation, ApproachReversed = true };
+		}
+		else
+		{
+			CentcomDest = new Destination { Orientation = Orientation.Right, Position = new Vector2(150, 6), ApproachReversed = false };
+			StationDest = new Destination { Orientation = Orientation.Right, Position = new Vector2(49, 6), ApproachReversed = true };
+		}
+	}
+
+	public bool OrientationRight;
+	public bool OrientationUp;
+	public Vector2 DockingLocationStation;
+	public Destination CentcomDest;
+	public Vector2 DockingLocationCentcom;
+	public Destination StationDest;
+
 	private Destination currentDestination;
 
 	[Tooltip("If escape shuttle movement is blocked for longer than this amount of time, will end the round" +
@@ -103,7 +128,7 @@ public class EscapeShuttle : NetworkBehaviour
 	/// Note it's not currently possible to construct thrusters. This is only stored server side.
 	/// Thrusters are removed from this when destroyed
 	/// </summary>
-	private List<ShipThruster> thrusters;
+	private List<ShipThruster> thrusters = new List<ShipThruster>();
 
 	private void Awake()
 	{
@@ -145,9 +170,11 @@ public class EscapeShuttle : NetworkBehaviour
 
 	IEnumerator WaitForGameOver()
 	{
-		yield return WaitFor.Seconds(25f);
+		//note: used to wait for 25 seconds, now less because
+		//we disabled the zoom out
+		yield return WaitFor.Seconds(15f);
 		// Trigger end of round
-		GameManager.Instance.RoundEnd();
+		GameManager.Instance.EndRound();
 	}
 
 	[ClientRpc]
@@ -241,6 +268,7 @@ public class EscapeShuttle : NetworkBehaviour
 		{
 			isReverse = true;
 			mm.ChangeFacingDirection(mm.ServerState.FacingDirection.Rotate(2));
+			PlaySoundMessage.SendToAll("ShuttleDocked", Vector3.zero, 1f);
 		}
 	}
 
@@ -360,19 +388,9 @@ public class EscapeShuttle : NetworkBehaviour
 		Status = ShuttleStatus.OnRouteCentcom;
 
 		currentDestination = Destination.Invalid;
-		mm.SetSpeed( 1 );
+		mm.SetSpeed( 100f );
 		mm.StartMovement();
-		mm.MaxSpeed = float.MaxValue; //hehe
-
-		StartCoroutine(LosingMyFavouriteGame());
-		IEnumerator LosingMyFavouriteGame()
-		{
-			while ( Status == ShuttleStatus.OnRouteCentcom )
-			{
-				yield return WaitFor.Seconds( 1.5f );
-				mm.SetSpeed( mm.ServerState.Speed * 1.5f );
-			}
-		}
+		mm.MaxSpeed = 100f;
 	}
 
 

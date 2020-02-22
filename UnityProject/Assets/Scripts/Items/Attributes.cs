@@ -12,7 +12,7 @@ using Random = System.Random;
 
 [RequireComponent(typeof(Integrity))]
 [RequireComponent(typeof(CustomNetTransform))]
-public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn
+public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn, IExaminable
 {
 
 	[Tooltip("Display name of this item when spawned.")]
@@ -72,24 +72,24 @@ public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn
 
 	public override void OnStartClient()
 	{
-		SyncArticleName(this.name);
-		SyncArticleDescription(this.articleDescription);
+		SyncArticleName(articleName, this.name);
+		SyncArticleDescription(articleDescription, this.articleDescription);
 		base.OnStartClient();
 	}
 
 
 	public virtual void OnSpawnServer(SpawnInfo info)
 	{
-		SyncArticleName(initialName);
-		SyncArticleDescription(initialDescription);
+		SyncArticleName(articleName, initialName);
+		SyncArticleDescription(articleDescription, initialDescription);
 	}
 
-	private void SyncArticleName(string newName)
+	private void SyncArticleName(string oldName, string newName)
 	{
 		articleName = newName;
 	}
 
-	private void SyncArticleDescription(string newDescription)
+	private void SyncArticleDescription(string oldDescription, string newDescription)
 	{
 		articleDescription = newDescription;
 	}
@@ -128,7 +128,7 @@ public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn
 	}
 
 
-	// Sends examine event to all monobehaviors on gameobject
+	// Sends examine event to all monobehaviors on gameobject - keep for now - TODO: integrate w shift examine
 	public void SendExamine()
 	{
 		SendMessage("OnExamine");
@@ -142,6 +142,28 @@ public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn
 		}
 	}
 
+	// Initial implementation of shift examine behaviour
+	public string Examine()
+	{
+		string displayName = "<error>";
+		if (string.IsNullOrWhiteSpace(articleName))
+		{
+			displayName = gameObject.ExpensiveName();
+		}
+		else
+		{
+			displayName = articleName;
+		}
+
+		string str = "This is a " + displayName + ".";
+
+		if (!string.IsNullOrEmpty(initialDescription))
+		{
+			str = str + " " + initialDescription;
+		}
+		return str;
+	}
+
 	public RightClickableResult GenerateRightClickOptions()
 	{
 		return RightClickableResult.Create()
@@ -151,13 +173,13 @@ public class Attributes : NetworkBehaviour, IRightClickable, IServerSpawn
 
 	public void ServerSetArticleName(string newName)
 	{
-		SyncArticleName(newName);
+		SyncArticleName(articleName, newName);
 	}
 
 	[Server]
 	public void ServerSetArticleDescription(string desc)
 	{
-		SyncArticleDescription(desc);
+		SyncArticleDescription(articleDescription, desc);
 	}
 
 }

@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  unitystation:
+    image: unitystation/unitystation:develop
+    ports:
+      - 6666:7777
+    volumes:
+      - /etc/UnityStation/admin:/UnityStation_Data/StreamingAssets/admin

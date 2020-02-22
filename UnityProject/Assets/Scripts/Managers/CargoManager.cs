@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Lucene.Net.Support;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,18 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class CargoManager : MonoBehaviour
 {
-	private static CargoManager _cargoManager;
-	public static CargoManager Instance
-	{
-		get
-		{
-			if (_cargoManager == null)
-			{
-				_cargoManager = FindObjectOfType<CargoManager>();
-			}
-			return _cargoManager;
-		}
-	}
+	public static CargoManager Instance;
 
 	public int Credits;
 	public ShuttleStatus ShuttleStatus = ShuttleStatus.DockedStation;
@@ -42,6 +32,18 @@ public class CargoManager : MonoBehaviour
 	private float shuttleFlyDuration = 10f;
 
 	private HashMap<string, ExportedItem> exportedItems = new HashMap<string, ExportedItem>();
+
+	private void Awake()
+	{
+		if (Instance == null)
+		{
+			Instance = this;
+		}
+		else
+		{
+			Destroy(this);
+		}
+	}
 
 	private void OnEnable()
 	{
@@ -110,7 +112,8 @@ public class CargoManager : MonoBehaviour
 
 	public void LoadData()
 	{
-		Supplies = cargoData.Supplies;
+		//need a shallow copy so the actual SO list isn't cleared on round restart!
+		Supplies = new List<CargoOrderCategory>(cargoData.Supplies);
 	}
 
 	private IEnumerator Timer(bool launchToStation)
@@ -255,6 +258,12 @@ public class CargoManager : MonoBehaviour
 
 		export.Count += count;
 		export.TotalValue += credits;
+
+		var playerScript = item.GetComponent<PlayerScript>();
+		if (playerScript != null)
+		{
+			playerScript.playerHealth.ServerGibPlayer();
+		}
 
 		item.registerTile.UnregisterClient();
 		item.registerTile.UnregisterServer();

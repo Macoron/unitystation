@@ -67,22 +67,19 @@ public class PlayerScript : ManagedNetworkBehaviour, IMatrixRotation
 	public override void OnStartClient()
 	{
 		Init();
-		SyncPlayerName(playerName);
-		base.OnStartClient();
+		SyncPlayerName(playerName, playerName);
 	}
 
 	//isLocalPlayer is always called after OnStartClient
 	public override void OnStartLocalPlayer()
 	{
 		Init();
-		base.OnStartLocalPlayer();
 	}
 
 	//You know the drill
 	public override void OnStartServer()
 	{
 		Init();
-		base.OnStartServer();
 	}
 
 	protected override void OnEnable()
@@ -181,7 +178,8 @@ public class PlayerScript : ManagedNetworkBehaviour, IMatrixRotation
 
 				UIManager.LinkUISlots();
 				//play the spawn sound
-				SoundManager.PlayAmbience();
+				SoundManager.Play("Ambient#");
+				SoundManager.PlayAmbience("ShipAmbience");
 				//Hide ghosts
 				var mask = Camera2DFollow.followControl.cam.cullingMask;
 				mask &= ~(1 << LayerMask.NameToLayer("Ghosts"));
@@ -194,7 +192,7 @@ public class PlayerScript : ManagedNetworkBehaviour, IMatrixRotation
 		}
 	}
 
-	public void SyncPlayerName(string value)
+	public void SyncPlayerName(string oldValue, string value)
 	{
 		playerName = value;
 		gameObject.name = value;
@@ -206,6 +204,22 @@ public class PlayerScript : ManagedNetworkBehaviour, IMatrixRotation
 	/// True if this player is a ghost, meaning they exist in the ghost layer
 	/// </summary>
 	public bool IsGhost => PlayerUtils.IsGhost(gameObject);
+
+	/// <summary>
+	/// Same as is ghost, but also true when player inside his dead body
+	/// </summary>
+	public bool IsDeadOrGhost
+	{
+		get
+		{
+			var isDeadOrGhost = IsGhost;
+			if (playerHealth != null)
+			{
+				isDeadOrGhost = playerHealth.IsDead;
+			}
+			return isDeadOrGhost;
+		}
+	}
 
 	public bool IsInReach(GameObject go, bool isServer, float interactDist = interactionDistance)
 	{
@@ -236,13 +250,7 @@ public class PlayerScript : ManagedNetworkBehaviour, IMatrixRotation
 
 	public ChatChannel GetAvailableChannelsMask(bool transmitOnly = true)
 	{
-		var isDeadOrGhost = IsGhost;
-		if (playerHealth != null)
-		{
-			isDeadOrGhost = playerHealth.IsDead;
-		}
-
-		if (isDeadOrGhost)
+		if (IsDeadOrGhost)
 		{
 			ChatChannel ghostTransmitChannels = ChatChannel.Ghost | ChatChannel.OOC;
 			ChatChannel ghostReceiveChannels = ChatChannel.Examine | ChatChannel.System | ChatChannel.Combat |

@@ -62,13 +62,19 @@ public class ChatEvent
 	public ChatModifier modifiers = ChatModifier.None;
 	public string speaker;
 	public double timestamp;
-	public Vector2 position;
+	public Vector3 position = TransformState.HiddenPos;
 	public GameObject originator;
 
 	/// <summary>
 	/// Send chat message only to those on this matrix
 	/// </summary>
-	public MatrixInfo matrix = MatrixInfo.Invalid;
+	public MatrixInfo matrix
+	{
+		get => _matrix;
+		set => _matrix = value;
+	}
+
+	private MatrixInfo _matrix = MatrixInfo.Invalid;
 
 	public ChatEvent() {
 		timestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;

@@ -109,6 +109,7 @@ public class MatrixMove : ManagedNetworkBehaviour
 	private MatrixState clientState = MatrixState.Invalid;
 
 	private List<ShipThruster> thrusters = new List<ShipThruster>();
+	public bool HasWorkingThrusters => thrusters.Count > 0;
 
 	private Vector3Int[] SensorPositions;
 	private GameObject[] RotationSensors;
@@ -139,8 +140,8 @@ public class MatrixMove : ManagedNetworkBehaviour
 
 	public override void OnStartClient()
 	{
-		SyncPivot(pivot);
-		SyncInitialPosition(initialPosition);
+		SyncPivot(pivot, pivot);
+		SyncInitialPosition(initialPosition, initialPosition);
 		clientStarted = true;
 	}
 
@@ -170,12 +171,12 @@ public class MatrixMove : ManagedNetworkBehaviour
 
 		Vector3Int initialPositionInt =
 			Vector3Int.RoundToInt(new Vector3(transform.position.x, transform.position.y, 0));
-		SyncInitialPosition(initialPositionInt);
+		SyncInitialPosition(initialPosition, initialPositionInt);
 
 		var child = transform.GetChild( 0 );
 		matrixInfo = MatrixManager.Get( child.gameObject );
 		var childPosition = Vector3Int.CeilToInt(new Vector3(child.transform.position.x, child.transform.position.y, 0));
-		SyncPivot(initialPosition - childPosition);
+		SyncPivot(pivot, initialPosition - childPosition);
 
 		Logger.LogTraceFormat("{0}: pivot={1} initialPos={2}", Category.Matrix, gameObject.name,
 			pivot, initialPositionInt);
@@ -184,7 +185,7 @@ public class MatrixMove : ManagedNetworkBehaviour
 		serverTargetState = serverState;
 		clientState = serverState;
 
-		thrusters = GetComponentsInChildren<ShipThruster>(true).ToList();
+		RecheckThrusters();
 		if ( thrusters.Count > 0 )
 		{
 			Logger.LogFormat( "{0}: Initializing {1} thrusters!", Category.Transform, matrixInfo.Matrix.name, thrusters.Count );
@@ -251,6 +252,11 @@ public class MatrixMove : ManagedNetworkBehaviour
 		}
 	}
 
+	private void RecheckThrusters()
+	{
+		thrusters = GetComponentsInChildren<ShipThruster>(true).ToList();
+	}
+
 	public void RegisterShuttleFuelSystem(ShuttleFuelSystem shuttleFuel)
 	{
 		this.shuttleFuelSystem = shuttleFuel;
@@ -261,12 +267,12 @@ public class MatrixMove : ManagedNetworkBehaviour
 		this.coordReadoutScript = coordReadout;
 	}
 
-	private void SyncInitialPosition(Vector3 initialPos)
+	private void SyncInitialPosition(Vector3 oldPos, Vector3 initialPos)
 	{
 		this.initialPosition = initialPos.RoundToInt();
 	}
 
-	private void SyncPivot(Vector3 pivot)
+	private void SyncPivot(Vector3 oldPivot, Vector3 pivot)
 	{
 		this.pivot = pivot.RoundToInt();
 	}
@@ -337,7 +343,12 @@ public class MatrixMove : ManagedNetworkBehaviour
 	[Server]
 	public void StartMovement()
 	{
-		if (IsFueled || !RequiresFuel)
+		if (!HasWorkingThrusters)
+		{
+			RecheckThrusters();
+		}
+		//Not allowing movement without any thrusters:
+		if (HasWorkingThrusters && (IsFueled || !RequiresFuel))
 		{
 			//Setting speed if there is none
 			if (serverTargetState.Speed <= 0)
@@ -509,11 +520,6 @@ public class MatrixMove : ManagedNetworkBehaviour
 				return;
 			}
 
-			var displacement = (clientState.Position - transform.position).magnitude;
-			if (displacement > 1)
-			{
-				Logger.LogWarningFormat("Yikes: " + displacement);
-			}
 			transform.position = clientState.Position;
 
 			//If stopped then lerp to target (snap to grid)

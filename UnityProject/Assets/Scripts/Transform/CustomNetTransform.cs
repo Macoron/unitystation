@@ -84,14 +84,19 @@ public partial class CustomNetTransform : ManagedNetworkBehaviour, IPushable, IR
 		get { return motionState; }
 		set
 		{
-			if ( motionState == value || UpdateManager.Instance == null )
+			if ( motionState == value || !UpdateManager.IsInitialized )
 			{
 				return;
 			}
 
 			if ( value == MotionStateEnum.Moving )
 			{
-				base.OnEnable();
+				StopCoroutine(limboHandle);
+
+				// In the case we become Still and then Moving again in one second, we're still updating because freeze timer hasn't finished yet.
+				// Checking here if timer has passed yet (so we're no longer updating), if we are still updating we don't have to call OnEnable again.
+				if (!IsUpdating)
+					base.OnEnable();
 			}
 			else
 			{
@@ -528,11 +533,13 @@ public partial class CustomNetTransform : ManagedNetworkBehaviour, IPushable, IR
 	[Server]
 	public void NotifyPlayers()
 	{
-		if (gameObject == null) return; //sometimes between round restarts a call might be made on an object being destroyed
+		//we check this == null to ensure this component hasn't been destroyed, sometimes
+		//this can get called before an object has been fully destroyed
+		if (this == null || gameObject == null) return; //sometimes between round restarts a call might be made on an object being destroyed
 
 		//	Logger.LogFormat( "{0} Notified: {1}", Category.Transform, gameObject.name, serverState.WorldPosition );
 		SyncMatrix();
-		
+
 		TransformStateMessage.SendToAll(gameObject, serverState);
 	}
 

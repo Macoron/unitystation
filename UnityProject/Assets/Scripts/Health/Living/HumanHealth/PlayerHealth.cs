@@ -9,6 +9,11 @@ using UnityEditor;
 /// </summary>
 public class PlayerHealth : LivingHealthBehaviour
 {
+	[SerializeField]
+	private MetabolismSystem metabolism;
+
+	public MetabolismSystem Metabolism { get => metabolism; }
+
 	private PlayerMove playerMove;
 
 	private PlayerNetworkActions playerNetworkActions;
@@ -22,11 +27,17 @@ public class PlayerHealth : LivingHealthBehaviour
 	//fixme: not actually set or modified. keep an eye on this!
 	public bool serverPlayerConscious { get; set; } = true; //Only used on the server
 
-	private void Awake()
+	public override void Awake()
 	{
 		base.Awake();
 
 		OnConsciousStateChangeServer.AddListener(OnPlayerConsciousStateChangeServer);
+
+		metabolism = GetComponent<MetabolismSystem>();
+		if (metabolism == null)
+		{
+			metabolism = gameObject.AddComponent<MetabolismSystem>();
+		}
 	}
 
 	public override void OnStartClient()
@@ -92,7 +103,7 @@ public class PlayerHealth : LivingHealthBehaviour
 					descriptor = "their";
 				}
 
-				Chat.AddLocalMsgToChat($"<b>{playerName}</b> seizes up and falls limp, {descriptor} eyes dead and lifeless...", (Vector3)registerPlayer.WorldPositionServer);
+				Chat.AddLocalMsgToChat($"<b>{playerName}</b> seizes up and falls limp, {descriptor} eyes dead and lifeless...", (Vector3)registerPlayer.WorldPositionServer, gameObject);
 			}
 
 			PlayerDeathMessage.Send(gameObject);
@@ -111,8 +122,15 @@ public class PlayerHealth : LivingHealthBehaviour
 		}
 	}
 
+	[Server]
+	public void ServerGibPlayer()
+	{
+		Gib();
+	}
+
 	protected override void Gib()
 	{
+		Death();
 		EffectsFactory.BloodSplat( transform.position, BloodSplatSize.large, bloodColor );
 		//drop clothes, gib... but don't destroy actual player, a piece should remain
 
@@ -122,21 +140,8 @@ public class PlayerHealth : LivingHealthBehaviour
 			Inventory.ServerDrop(slot);
 		}
 
-		if (!playerMove.PlayerScript.IsGhost)
-		{ //dirty way to follow gibs. change this when implementing proper gibbing, perhaps make it follow brain
-			var gibsToFollow = MatrixManager.GetAt<RawMeat>( transform.position.CutToInt(), true );
-			if ( gibsToFollow.Count > 0 )
-			{
-				var gibs = gibsToFollow[0];
-				FollowCameraMessage.Send(gameObject, gibs.gameObject);
-				var gibsIntegrity = gibs.GetComponent<Integrity>();
-				if ( gibsIntegrity != null )
-				{	//Stop cam following gibs if they are destroyed
-					gibsIntegrity.OnWillDestroyServer.AddListener( x => FollowCameraMessage.Send( gameObject, null ) );
-				}
-			}
-		}
 		playerMove.PlayerScript.pushPull.VisibleState = false;
+		playerNetworkActions.ServerSpawnPlayerGhost();
 	}
 
 	///     make player unconscious upon crit

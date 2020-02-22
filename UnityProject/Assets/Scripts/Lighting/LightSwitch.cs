@@ -9,7 +9,6 @@ using System;
 /// Automatically determines what lights it is hooked up to based on its facing direction (set in Directional)
 /// on startup and sets their RelatedAPC to this light switch's related apc.
 /// </summary>
-[ExecuteInEditMode]
 [RequireComponent(typeof(Directional))]
 public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 {
@@ -43,50 +42,31 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 	private bool switchCoolDown;
 	private RegisterTile registerTile;
 	public bool SelfPowered = false;
+	public bool preventStartUpCache;
 	public List<LightSource> SelfPowerLights = new List<LightSource>();
 
 	private Directional directional;
 
-	private void Awake()
+	private void EnsureInit()
 	{
-		if (!Application.isPlaying)
+		if (this == null)
 		{
 			return;
 		}
-
-		this.directional = GetComponent<Directional>();
+		directional = GetComponent<Directional>();
 		registerTile = GetComponent<RegisterTile>();
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		clickSFX = GetComponent<AudioSource>();
 	}
 
-	void Update()
-	{
-		if (!Application.isPlaying)
-		{
-			if (!SelfPowered && RelatedAPC == null)
-			{
-				Logger.LogError("Lightswitch is missing APC reference, at " + transform.position, Category.Electrical);
-				RelatedAPC.Current = 1; //so It will bring up an error, you can go to click on to go to the actual object with the missing reference
-			}
-			return;
-		}
-	}
-
-
-
 	private void Start()
 	{
-		if (!Application.isPlaying)
-		{
-			return;
-		}
 		//This is needed because you can no longer apply lightSwitch prefabs (it will move all of the child sprite positions)
 		gameObject.layer = LayerMask.NameToLayer("WallMounts");
 		//and the rest of the mask caches:
 		lightingMask = LayerMask.GetMask("Lighting");
 		obstacleMask = LayerMask.GetMask("Walls", "Door Open", "Door Closed");
-		WaitForLoad();
+		EnsureInit();
 		if(!SelfPowered) DetectAPC();
 		DetectLightsAndAction(true);
 		if (RelatedAPC != null)
@@ -105,7 +85,7 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 	{
 		if (Voltage < AtShutOffVoltage && isOn == States.On)
 		{
-			SyncLightSwitch( States.PowerCut);
+			SyncLightSwitch(isOn, States.PowerCut);
 			PowerCut = true;
 			if (PowerCut)
 			{
@@ -115,21 +95,16 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 		}
 		else if (PowerCut == true && Voltage > AtShutOffVoltage)
 		{
-			SyncLightSwitch(States.On);
+			SyncLightSwitch(isOn, States.On);
 			PowerCut = false;
 		}
 
 	}
 	public override void OnStartClient()
 	{
-		SyncLightSwitch(this.isOn);
-		StartCoroutine(WaitForLoad());
-	}
-
-	private IEnumerator WaitForLoad()
-	{
-		yield return WaitFor.Seconds(3f);
-		SyncLightSwitch(isOn);
+		base.OnStartClient();
+		EnsureInit();
+		SyncLightSwitch(isOn, this.isOn);
 	}
 
 	public bool Interact(HandApply interaction)
@@ -198,7 +173,7 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 		}
 		if (RelatedAPC == null && !SelfPowered)
 		{
-			SyncLightSwitch(States.PowerCut);
+			SyncLightSwitch(isOn, States.PowerCut);
 		}
 	}
 
@@ -208,6 +183,21 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 		{
 			return;
 		}
+
+		if (preventStartUpCache)
+		{
+			if (SelfPowered)
+			{
+				foreach (var l in SelfPowerLights)
+				{
+					LightSwitchData Send = new LightSwitchData() { state = state, LightSwitch = this, RelatedAPC = RelatedAPC };
+					l.gameObject.SendMessage("Received", Send, SendMessageOptions.DontRequireReceiver);
+				}
+			}
+
+			return;
+		}
+
 		Vector2 startPos = GetCastPos();
 		//figure out which lights this switch is hooked up to based on proximity and facing
 		int length = Physics2D.OverlapCircleNonAlloc(startPos, radius, lightSpriteColliders, lightingMask);
@@ -252,8 +242,9 @@ public class LightSwitch : NetworkBehaviour, IClientInteractable<HandApply>
 		return newPos;
 	}
 
-	private void SyncLightSwitch(States state)
+	private void SyncLightSwitch(States oldState, States state)
 	{
+		EnsureInit();
 		isOn = state;
 		if (state == States.On)
 		{

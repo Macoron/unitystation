@@ -59,7 +59,8 @@ public class Meleeable : MonoBehaviour, IPredictedCheckedInteractable<Positional
 		//clientPredictInteraction on clientside
 		if (Cooldowns.IsOn(interaction, CooldownID.Asset(CommonCooldowns.Instance.Melee, side)))
 		{
-			return false;
+			interaction = PositionalHandApply.Invalid;
+			return true;
 		}
 
 		//not punching unless harm intent
@@ -100,6 +101,10 @@ public class Meleeable : MonoBehaviour, IPredictedCheckedInteractable<Positional
 		{
 			//attacking tiles
 			var tileAt = interactableTiles.LayerTileAt(interaction.WorldPositionTarget, true);
+			if (tileAt == null)
+			{
+				return;
+			}
 			wna.ServerPerformMeleeAttack(gameObject, interaction.TargetVector, BodyPartType.None, tileAt.LayerType);
 		}
 		else

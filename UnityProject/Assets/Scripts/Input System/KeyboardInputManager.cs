@@ -81,6 +81,8 @@ public class KeyboardInputManager : MonoBehaviour
 	/// <param name="keyEventType">Key event to check for like down, up or hold</param>
 	public static bool IsMovementPressed(KeyEventType keyEventType = KeyEventType.Down)
 	{
+		if (UIManager.IsInputFocus) return false;
+
 		return Instance.CheckKeyAction(KeyAction.MoveUp,   keyEventType) || Instance.CheckKeyAction(KeyAction.MoveDown,  keyEventType) ||
 		       Instance.CheckKeyAction(KeyAction.MoveLeft, keyEventType) || Instance.CheckKeyAction(KeyAction.MoveRight, keyEventType);
 	}
@@ -108,6 +110,14 @@ public class KeyboardInputManager : MonoBehaviour
 	{
 		return CommonInput.GetKey(KeyCode.LeftControl) || CommonInput.GetKey(KeyCode.RightControl) ||
 		       CommonInput.GetKey(KeyCode.LeftCommand) || CommonInput.GetKey(KeyCode.RightCommand);
+	}
+
+	/// <summary>
+	/// Checks if the left or right shift key has been pressed
+	/// </summary>
+	public static bool IsShiftPressed()
+	{
+		return CommonInput.GetKey(KeyCode.LeftShift) || CommonInput.GetKey(KeyCode.RightShift);
 	}
 
 	/// <summary>
@@ -163,7 +173,7 @@ public class KeyboardInputManager : MonoBehaviour
 		{ KeyAction.IntentHarm, 	() => { UIManager.Intent.SetIntent(Intent.Harm); }},
 
 		// Chat
-		{ KeyAction.ChatLocal,		() => { ChatUI.Instance.OpenChatWindow(); }},
+		{ KeyAction.ChatLocal,		() => { ChatUI.Instance.OpenChatWindow(ChatChannel.Local); }},
 		{ KeyAction.ChatRadio,		() => { ChatUI.Instance.OpenChatWindow(ChatChannel.Common); }},
 		{ KeyAction.ChatOOC,		() => { ChatUI.Instance.OpenChatWindow(ChatChannel.OOC); }},
 

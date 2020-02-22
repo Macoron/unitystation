@@ -56,8 +56,13 @@ public class NetworkTabManager : MonoBehaviour {
 	}
 
 	/// Used when a new dynamic element is added/removed
-	public void Rescan( NetTabDescriptor tabDescriptor ) {
-		Get( tabDescriptor ).RescanElements();
+	public void Rescan( NetTabDescriptor tabDescriptor )
+	{
+		var netTab = Get( tabDescriptor );
+		if (netTab != null)
+		{
+			netTab.RescanElements();
+		}
 	}
 
 	///Create new NetworkTabInfo if it doesn't exist, otherwise add player to it
@@ -84,7 +89,9 @@ public class NetworkTabManager : MonoBehaviour {
 	}
 
 	/// remove player from NetworkTabInfo, keeping the tab
-	public void Remove( NetTabDescriptor tabDescriptor, GameObject player ) {
+	public void Remove( NetTabDescriptor tabDescriptor, GameObject player )
+	{
+		if (!openTabs.ContainsKey(tabDescriptor)) return;
 		NetTab t = openTabs[tabDescriptor];
 		t.RemovePlayer( player );
 //		if ( t.Peepers.Count == 0 ) {

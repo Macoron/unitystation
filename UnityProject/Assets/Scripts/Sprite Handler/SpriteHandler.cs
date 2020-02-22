@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 ///	</summary>
 public class SpriteHandler : MonoBehaviour
 {
-	public SpriteData spriteData;
+	public SpriteData spriteData = new SpriteData();
 
 	public List<SpriteSheetAndData> Sprites = new List<SpriteSheetAndData>();
 
@@ -50,11 +50,18 @@ public class SpriteHandler : MonoBehaviour
 	{
 		yield return WaitFor.EndOfFrame;
 		Initialised = true;
-		spriteRenderer = this.GetComponent<SpriteRenderer>();
+		if (spriteData == null) {
+			spriteData = new SpriteData();
+		}
 		if (spriteRenderer != null && SetSpriteOnStartUp && spriteData.HasSprite())
 		{
 			PushTexture();
 		}
+	}
+
+	private void OnEnable()
+	{
+		spriteRenderer = GetComponent<SpriteRenderer>();
 	}
 
 	private void OnDisable()
@@ -77,17 +84,47 @@ public class SpriteHandler : MonoBehaviour
 		TryToggleAnimationState(false);
 	}
 
+	private bool isPaletted()
+	{
+		if (spriteData == null || spriteData.isPaletteds == null || spriteData.isPaletteds.Count == 0)
+			return false;
+		return spriteData.isPaletteds[spriteIndex];
+	}
+
+	private List<Color> getPaletteOrNull()
+	{
+		if (!isPaletted())
+			return null;
+
+
+		return spriteData.palettes[spriteIndex];
+	}
+
+	public void SetPaletteOfCurrentSprite(List<Color> newPalette)
+	{
+		if (isPaletted())
+		{
+			spriteData.palettes[spriteIndex] = newPalette;
+			PushTexture();
+		}
+
+	}
+
+
 	public void PushTexture()
 	{
 		if (Initialised)
 		{
-			if (spriteData != null)
+			if (spriteData != null && spriteData.List != null)
 			{
 				if (spriteIndex < spriteData.List.Count &&
 					variantIndex < spriteData.List[spriteIndex].Count &&
 					animationIndex < spriteData.List[spriteIndex][variantIndex].Count)
 				{
-					SetSprite(spriteData.List[spriteIndex][variantIndex][animationIndex]);
+					SpriteInfo curSpriteInfo = spriteData.List[spriteIndex][variantIndex][animationIndex];
+					
+					SetSprite(curSpriteInfo, getPaletteOrNull());
+
 					TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
 					return;
 				}
@@ -95,7 +132,10 @@ public class SpriteHandler : MonoBehaviour
 						 variantIndex < spriteData.List[spriteIndex].Count)
 				{
 					animationIndex = 0;
-					SetSprite(spriteData.List[spriteIndex][variantIndex][animationIndex]);
+
+					SpriteInfo curSpriteInfo = spriteData.List[spriteIndex][variantIndex][animationIndex];
+					SetSprite(curSpriteInfo, getPaletteOrNull());
+
 					TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
 					return;
 				}
@@ -117,48 +157,87 @@ public class SpriteHandler : MonoBehaviour
 			{
 				animationIndex = 0;
 			}
-			SetSprite(spriteData.List[spriteIndex][variantIndex][animationIndex]);
+
+			SpriteInfo curSpriteInfo = spriteData.List[spriteIndex][variantIndex][animationIndex];
+			SetSprite(curSpriteInfo, getPaletteOrNull());
 		}
 		if (!isAnimation)
 		{
-			UpdateManager.Instance.Remove(UpdateMe);
+			UpdateManager.Remove(CallbackType.UPDATE, UpdateMe);
 			spriteRenderer.sprite = null;
 		}
 	}
 
-	private void SetSprite(SpriteInfo animationStills)
+	private void SetSprite(SpriteInfo animationStills, List<Color> palette = null)
 	{
 		timeElapsed = 0;
 		waitTime = animationStills.waitTime;
+		if (spriteRenderer == null)
+		{
+			spriteRenderer = GetComponent<SpriteRenderer>();
+			if (spriteRenderer == null)
+			{
+				Logger.Log($"There is no spriterenderer on this object {name}");
+				return;
+			}
+		}
 		spriteRenderer.sprite = animationStills.sprite;
+		MaterialPropertyBlock block = new MaterialPropertyBlock();
+		spriteRenderer.GetPropertyBlock(block);
+
+		if (palette != null)
+		{
+			List<Vector4> pal = palette.ConvertAll<Vector4>((Color c) => new Vector4(c.r, c.g, c.b, c.a));
+			block.SetVectorArray("_ColorPalette", pal);
+			block.SetInt("_IsPaletted", 1);
+		}
+		else
+		{
+			block.SetInt("_IsPaletted", 0);
+		}
+		spriteRenderer.SetPropertyBlock(block);
+
+
 	}
 
 	public void ChangeSprite(int newSprites)
 	{
-		if (newSprites < spriteData.List.Count &&
-			spriteIndex != newSprites &&
-			variantIndex < spriteData.List[newSprites].Count)
+		if (spriteData.List != null)
 		{
-			spriteIndex = newSprites;
-			animationIndex = 0;
-			SetSprite(spriteData.List[spriteIndex][variantIndex][animationIndex]);
-			TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
+			if (newSprites < spriteData.List.Count &&
+				spriteIndex != newSprites &&
+				variantIndex < spriteData.List[newSprites].Count)
+			{
+				spriteIndex = newSprites;
+				animationIndex = 0;
+
+				SpriteInfo curSpriteInfo = spriteData.List[spriteIndex][variantIndex][animationIndex];
+				SetSprite(curSpriteInfo, getPaletteOrNull());
+
+				TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
+			}
 		}
 	}
 
 	public void ChangeSpriteVariant(int spriteVariant)
 	{
-		if (spriteIndex < spriteData.List.Count &&
-			spriteVariant < spriteData.List[spriteIndex].Count &&
-			variantIndex != spriteVariant)
+		if (spriteData.List != null)
 		{
-			if (spriteData.List[spriteIndex][spriteVariant].Count <= animationIndex)
+			if (spriteIndex < spriteData.List.Count &&
+				spriteVariant < spriteData.List[spriteIndex].Count &&
+				variantIndex != spriteVariant)
 			{
-				animationIndex = 0;
+				if (spriteData.List[spriteIndex][spriteVariant].Count <= animationIndex)
+				{
+					animationIndex = 0;
+				}
+				variantIndex = spriteVariant;
+
+				SpriteInfo curSpriteInfo = spriteData.List[spriteIndex][variantIndex][animationIndex];
+				SetSprite(curSpriteInfo, getPaletteOrNull());
+
+				TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
 			}
-			SetSprite(spriteData.List[spriteIndex][spriteVariant][animationIndex]);
-			variantIndex = spriteVariant;
-			TryToggleAnimationState(spriteData.List[spriteIndex][variantIndex].Count > 1);
 		}
 	}
 
@@ -167,12 +246,12 @@ public class SpriteHandler : MonoBehaviour
 		//UpdateManager.Instance.Remove(UpdateMe);
 		if (turnOn && !isAnimation)
 		{
-			UpdateManager.Instance.Add(UpdateMe);
+			UpdateManager.Add(CallbackType.UPDATE, UpdateMe);
 			isAnimation = true;
 		}
 		else if (!turnOn && isAnimation)
 		{
-			UpdateManager.Instance.Remove(UpdateMe);
+			UpdateManager.Remove(CallbackType.UPDATE, UpdateMe);
 			isAnimation = false;
 		}
 	}
@@ -192,7 +271,8 @@ public class SpriteHandler : MonoBehaviour
 			PushTexture();
 		}
 		else {
-			SetSpriteOnStartUp = true;		}
+			SetSpriteOnStartUp = true;
+		}
 	}
 
 	/// <summary>
@@ -211,14 +291,13 @@ public class SpriteHandler : MonoBehaviour
 			PushTexture();
 		}
 		else {
-			SetSpriteOnStartUp = true;	
+			SetSpriteOnStartUp = true;
 		}
 	}
 
 	void Start()
 	{
 		AddSprites();
-		spriteRenderer = this.GetComponent<SpriteRenderer>();
 		StartCoroutine(WaitForInitialisation());
 	}
 
@@ -226,6 +305,10 @@ public class SpriteHandler : MonoBehaviour
 	{
 		foreach (var Data in Sprites)
 		{
+			if (spriteData.List == null)
+			{
+				spriteData.List = new List<List<List<SpriteInfo>>>();
+			}
 			spriteData.List.Add(SpriteFunctions.CompleteSpriteSetup(Data));
 		}
 
@@ -249,5 +332,5 @@ public class SpriteHandlerState
 	public int spriteIndex;
 	public int variantIndex;
 	public int animationIndex;
-	public bool hasSprite; 
+	public bool hasSprite;
 }

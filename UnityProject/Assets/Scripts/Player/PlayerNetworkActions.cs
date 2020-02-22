@@ -113,6 +113,32 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 	}
 
 	/// <summary>
+	/// Request to drop alls item from ItemStorage, send an item slot net id of
+	/// one of the slots on the item storage
+	/// </summary>
+	/// <param name="itemSlotID"></param>
+	[Command]
+	public void CmdDropAllItems(uint itemSlotID)
+	{
+		var netInstance = NetworkIdentity.spawned[itemSlotID];
+		if (netInstance == null) return;
+
+		var itemStorage = netInstance.GetComponent<ItemStorage>();
+		if (this.itemStorage == null) return;
+
+		var slots = itemStorage.GetItemSlots();
+		if (slots == null) return;
+
+		var validateSlot = itemStorage.GetIndexedItemSlot(0);
+		if (validateSlot.RootPlayer() != playerScript.registerTile) return;
+
+		foreach (var item in slots)
+		{
+			Inventory.ServerDrop(item);
+		}
+	}
+
+	/// <summary>
 	/// Completely disrobes another player
 	/// </summary>
 	[Command]
@@ -160,17 +186,6 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 		var slot = itemStorage.GetNamedItemSlot(equipSlot);
 		Inventory.ServerThrow(slot, worldTargetVector,
 			equipSlot == NamedSlot.leftHand ? SpinMode.Clockwise : SpinMode.CounterClockwise, (BodyPartType) aim);
-	}
-
-	[Command] //Remember with the parent you can only send networked objects:
-	public void CmdPlaceItem(NamedSlot equipSlot, Vector3 worldPos, GameObject newParent, bool isTileMap)
-	{
-		var targetVector = worldPos - gameObject.TileWorldPosition().To3Int();
-		if (!Validations.CanApply(playerScript, newParent, NetworkSide.Server, targetVector: targetVector)) return;
-		if (!Cooldowns.TryStartServer(playerScript, CommonCooldowns.Instance.Interaction)) return;
-
-		var slot = itemStorage.GetNamedItemSlot(equipSlot);
-		Inventory.ServerDrop(slot, worldPos);
 	}
 
 	[Command]
@@ -221,10 +236,12 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 	}
 
 	[Command]
-	public void CmdRegisterVote(string userId, bool isFor)
+	public void CmdRegisterVote(bool isFor)
 	{
 		if (VotingManager.Instance == null) return;
-		VotingManager.Instance.RegisterVote(userId, isFor);
+		var connectedPlayer = PlayerList.Instance.Get(gameObject);
+		if (connectedPlayer == ConnectedPlayer.Invalid) return;
+		VotingManager.Instance.RegisterVote(connectedPlayer.UserId, isFor);
 	}
 
 	/// <summary>
@@ -328,10 +345,10 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 				break;
 		}
 
-		playerScript.pushPull.CmdStopPulling();
+		playerScript.pushPull.ServerStopPulling();
 	}
 
-	[Command]
+	[Server]
 	public void CmdToggleChatIcon(bool turnOn, string message, ChatChannel chatChannel, ChatModifier chatModifier)
 	{
 		if (!playerScript.pushPull.VisibleState || (playerScript.mind.occupation.JobType == JobType.NULL)
@@ -392,7 +409,15 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 	[Command]
 	public void CmdSpawnPlayerGhost()
 	{
-		if (GetComponent<LivingHealthBehaviour>().IsDead)
+		ServerSpawnPlayerGhost();
+	}
+
+	[Server]
+	public void ServerSpawnPlayerGhost()
+	{
+		//Only force to ghost if the mind belongs in to that body
+		var currentMobID = GetComponent<LivingHealthBehaviour>().mobID;
+		if (GetComponent<LivingHealthBehaviour>().IsDead && !playerScript.IsGhost && playerScript.mind.bodyMobID == currentMobID)
 		{
 			PlayerSpawn.ServerSpawnGhost(playerScript.mind);
 		}
@@ -431,48 +456,6 @@ public partial class PlayerNetworkActions : NetworkBehaviour
 	{
 		//no more input can be sent to the body.
 		GetComponent<MouseInputController>().enabled = false;
-	}
-
-	//FOOD
-	[Command]
-	public void CmdEatFood(GameObject food, NamedSlot fromSlot, bool isDrink)
-	{
-		if (!Validations.CanInteract(playerScript, NetworkSide.Server)) return;
-
-		var slot = itemStorage.GetNamedItemSlot(fromSlot);
-		if (slot.Item == null)
-		{
-			//Already been eaten or the food is no longer in hand
-			return;
-		}
-
-		if (!Cooldowns.TryStartServer(playerScript, CommonCooldowns.Instance.Interaction)) return;
-		Edible baseFood = food.GetComponent<Edible>();
-		if (isDrink)
-		{
-			SoundManager.PlayNetworkedAtPos("Slurp", transform.position);
-		}
-		else
-		{
-			SoundManager.PlayNetworkedAtPos("EatFood", transform.position);
-		}
-
-		PlayerHealth playerHealth = GetComponent<PlayerHealth>();
-
-		//FIXME: remove blood changes after TDM
-		//and use this Cmd for healing hunger and applying
-		//food related attributes instead:
-		playerHealth.bloodSystem.BloodLevel += baseFood.healAmount;
-		playerHealth.bloodSystem.StopBleedingAll();
-
-		Inventory.ServerDespawn(slot);
-
-		GameObject leavings = baseFood.leavings;
-		if (leavings != null)
-		{
-			leavings = Spawn.ServerPrefab(leavings).GameObject;
-			Inventory.ServerAdd(leavings.GetComponent<Pickupable>(), slot);
-		}
 	}
 
 	[Command]

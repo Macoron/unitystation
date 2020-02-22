@@ -6,7 +6,7 @@
         "Mirror.Components",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "PerformanceTests.Editor",
+        "Editor",
         "Unity.PerformanceTesting"
     ],
     "includePlatforms": [
