@@ -6,10 +6,11 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Chemistry.Components;
+using UnityEditor.SceneManagement;
 
 namespace Tests.Chemistry
 {
-    public class ReactionContainerFixture
+    public class ReactionContainerFixture : IPrebuildSetup
     {
         private static ReagentContainer GetContainer(int maxCapacity, ReagentMix contents)
         {
@@ -226,5 +227,14 @@ namespace Tests.Chemistry
             container.TakeReagents(amountToMove);
             AssertContainerContentsEqualTo(container, final);
         }
-    }
+
+		public void Setup()
+		{
+			string TestScenePath = "Assets/Tests/EmptySceneForTests.unity";
+			if (EditorSceneManager.GetActiveScene().path == string.Empty)
+			{
+				EditorSceneManager.OpenScene(TestScenePath);
+			}
+		}
+	}
 }
