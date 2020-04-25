@@ -9,8 +9,34 @@ using UnityEngine;
 /// </summary>
 public abstract class Consumable : MonoBehaviour, ICheckedInteractable<HandApply>
 {
+	/// <summary>
+	/// Default cooldown for consumable
+	/// </summary>
+	protected Cooldown ConsumingCooldown
+	{
+		get
+		{
+			if (!CommonCooldowns.Instance)
+			{
+				return null;
+			}
+
+			return CommonCooldowns.Instance.Consuming;
+		}
+	}
+
 	public void ServerPerformInteraction(HandApply interaction)
 	{
+		// check cooldown server-side
+		if (ConsumingCooldown)
+		{
+			var hasCooldown = !Cooldowns.TryStartServer(interaction.PerformerPlayerScript, ConsumingCooldown);
+			if (hasCooldown)
+			{
+				return;
+			}
+		}
+
 		var targetPlayer = interaction.TargetObject.GetComponent<PlayerScript>();
 		if (targetPlayer == null)
 		{
@@ -34,15 +60,17 @@ public abstract class Consumable : MonoBehaviour, ICheckedInteractable<HandApply
 		if (Validations.IsTarget(gameObject, interaction)) return false;
 
 		if (!DefaultWillInteract.Default(interaction, side)) return false;
-		return CanBeConsumedBy(interaction.TargetObject);
+
+		return CanBeConsumedBy(interaction.TargetObject, side);
 	}
 
 	/// <summary>
 	/// Check thats eater can consume this item
+	/// Called both on clinet and server
 	/// </summary>
 	/// <param name="eater">Player that want to eat item</param>
 	/// <returns></returns>
-	public virtual bool CanBeConsumedBy(GameObject eater)
+	public virtual bool CanBeConsumedBy(GameObject eater, NetworkSide side)
 	{
 		//todo: support npc force feeding
 		var targetPlayer = eater.GetComponent<PlayerScript>();

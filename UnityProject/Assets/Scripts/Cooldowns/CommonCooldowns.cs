@@ -17,4 +17,9 @@ public class CommonCooldowns : SingletonScriptableObject<CommonCooldowns>
 	/// cannot be quickly spammed.
 	/// </summary>
 	public Cooldown Melee;
+	/// <summary>
+	/// Cooldown for drinking or chewing something.
+	/// A bit longer than basic interaction.
+	/// </summary>
+	public Cooldown Consuming;
 }
