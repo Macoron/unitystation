@@ -118,7 +118,7 @@ public class Meleeable : MonoBehaviour, IPredictedCheckedInteractable<Positional
 			wna.ServerPerformMeleeAttack(gameObject, interaction.TargetVector, BodyPartType.None, tileAt.LayerType);
 			if (Validations.HasItemTrait(handObject, CommonTraits.Instance.Breakable))
 			{
-				handObject.GetComponent<ItemBreakable>().AddDamage();
+				handObject.GetComponent<ItemBreakable>()?.AddDamage();
 			}
 		}
 		else
@@ -149,7 +149,7 @@ public class Meleeable : MonoBehaviour, IPredictedCheckedInteractable<Positional
 				wna.ServerPerformMeleeAttack(gameObject, interaction.TargetVector, interaction.TargetBodyPart, LayerType.None);
 				if (Validations.HasItemTrait(handObject, CommonTraits.Instance.Breakable))
 				{
-					handObject.GetComponent<ItemBreakable>().AddDamage();
+					handObject.GetComponent<ItemBreakable>()?.AddDamage();
 				}
 			}
 		}

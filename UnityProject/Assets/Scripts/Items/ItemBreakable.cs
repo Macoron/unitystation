@@ -1,47 +1,101 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemBreakable : MonoBehaviour
 {
-	private Integrity integrity;
-
+	[Tooltip("Damage applied to THIS item integrity when player hit other object")]
 	public float damageOnHit;
 
-	public int integrityHealth;
-
+	[Tooltip("Prefab to spawn when object was destroyed")]
 	public GameObject brokenItem;
 
+	[Tooltip("Sound to play when object was destroyed")]
 	public string soundOnBreak;
 
-	// Start is called before the first frame update
-	void Awake()
-	{
-		integrity = GetComponent<Integrity>();
+	private CustomNetTransform netTransform;
+	private Integrity integrity;
+	private Pickupable pickupable;
 
-		integrity.OnApllyDamage.AddListener(OnDamageReceived);
+	private void Awake()
+	{
+		netTransform = GetComponent<CustomNetTransform>();
+		if (netTransform)
+		{
+			// when player threw this item and hit something
+			netTransform.OnThrowEnd.AddListener((info) => AddDamage());
+		}
+
+		integrity = GetComponent<Integrity>();
+		if (integrity)
+		{
+			// when this item destroyed for any reason
+			integrity.OnWillDestroyServer.AddListener((info) => OnWillDestroy());
+		}
+
+		pickupable = GetComponent<Pickupable>();
 	}
 
+	/// <summary>
+	/// Apply damageOnHit to this item integrity
+	/// </summary>
 	public void AddDamage()
 	{
-		integrity.ApplyDamage(damageOnHit, AttackType.Melee, DamageType.Brute);
-		if (integrity.integrity <= integrityHealth)
+		if (damageOnHit > 0 && integrity)
 		{
-			ChangeState();
+			integrity.ApplyDamage(damageOnHit, AttackType.Melee, DamageType.Brute);
 		}
 	}
-	private void ChangeState()
+
+	/// <summary>
+	/// Called just before item will be destroyed
+	/// Plays sound and spawn broken prefab
+	/// </summary>
+	private void OnWillDestroy()
 	{
-		SoundManager.PlayNetworkedAtPos(soundOnBreak, gameObject.AssumedWorldPosServer(), sourceObj: gameObject);
-		Spawn.ServerPrefab(brokenItem, gameObject.AssumedWorldPosServer());
-		Despawn.ServerSingle(gameObject);
+		// Play sound if avaliable
+		if (!string.IsNullOrEmpty(soundOnBreak))
+		{
+			SoundManager.PlayNetworkedAtPos(soundOnBreak,
+				gameObject.AssumedWorldPosServer());
+		}
+
+		// spawn broken object next (if avaliable)
+		SpawnBrokenItem();
 	}
 
-	private void OnDamageReceived(DamageInfo arg0)
+	private void SpawnBrokenItem()
 	{
-		if (integrity.integrity <= integrityHealth)
+		if (!brokenItem)
 		{
-			ChangeState();
+			return;
+		}
+
+		// spawn broken item
+		var spawnResult = Spawn.ServerPrefab(brokenItem,
+			worldPosition: gameObject.AssumedWorldPosServer(),
+			localRotation: transform.localRotation);
+
+		// check if spawn worked right
+		if (spawnResult.Successful)
+		{
+			var brokenGO = spawnResult.GameObject;
+			var brokenPickupable = brokenGO.GetComponent<Pickupable>();
+
+			// check if object can be added to inventory
+			if (pickupable && brokenPickupable)
+			{
+				// check if old item was in inventory
+				var slot = pickupable.ItemSlot;
+				if (slot != null)
+				{
+					// now replace old item by new one
+					// use drop because Integrity script will despawn object anyway
+					Inventory.ServerAdd(brokenPickupable, slot,
+						ReplacementStrategy.DropOther);
+				}
+			}
 		}
 	}
 }
