@@ -182,6 +182,30 @@ public class CustomNetworkManager : NetworkManager
 		NetworkManagerExtensions.RegisterClientHandlers();
 
 		base.OnClientConnect(conn);
+
+		// Replaces standard Mirror ObjectHideMessage clients handler
+		// Default logic for Mirror is to destoy hidden object and respawn
+		// it when it became visible. We can't do that due to custom pooling system
+		NetworkClient.UnregisterHandler<ObjectHideMessage>();
+		NetworkClient.RegisterHandler<ObjectHideMessage>(OnObjectHide);
+	}
+
+	/// <summary>
+	/// Called on client when NetworkIdentity became invisible for clients player
+	/// </summary>
+	private void OnObjectHide(NetworkConnection conn, ObjectHideMessage msg)
+	{
+		var netId = msg.netId;
+
+		// Check if network identity exists on client
+		if (NetworkIdentity.spawned.TryGetValue(netId, out NetworkIdentity localObject) && localObject != null)
+		{
+			// Do the custom clientside logic with now invisible object (hide sprite, etc)
+		}
+		else
+		{
+			Logger.LogWarning("Did not find target for hide message for " + netId, Category.NetMessage);
+		}
 	}
 
 	public override void OnClientDisconnect(NetworkConnection conn)
