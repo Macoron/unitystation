@@ -11,52 +11,71 @@ public class ProximityObserver : NetworkBehaviour
 	[Tooltip("How far observer can see networked objects. The faster object moves the bigger this value should be.")]
 	public float ViewRadius = 1;
 
-	private HashSet<ProximityObject> allObservedObjects
+	private HashSet<ProximityObject> lastObservedObjects
 		= new HashSet<ProximityObject>();
 
 	[ServerCallback]
 	private void Update()
 	{
-		if (!ProximityManager.Instance)
-			return;
+		//if (!ProximityManager.Instance)
+			//return;
 
 		// Get viewer position
 		var viewerPos = transform.position;
 
 		// Find all visible objects in view radius
-		var visibleObjects = ProximityManager.Instance.GetVisibleObjects(viewerPos, ViewRadius);
+		var curObservedObjects = ProximityManager.Instance.GetVisibleObjects(viewerPos, ViewRadius);
+		curObservedObjects.Add(GetComponent<ProximityObject>());
 
 		// Check if old objects left observer sight 
-		foreach (var obj in allObservedObjects)
+		foreach (var obj in lastObservedObjects)
 		{
 			if (!obj)
 			{
 				// looks like object got destroyed - better delete it now from set
-				visibleObjects.Remove(obj);
+				curObservedObjects.Remove(obj);
 				continue;
 			}
 
-			if (!visibleObjects.Contains(obj))
+			if (!curObservedObjects.Contains(obj))
 			{
-				// object left this observer sight
-				visibleObjects.Remove(obj);
 				obj.RemoveObserver(connectionToClient);
 			}
 		}
 
 		// Add this observer to all new visible objects
-		foreach (var obj in visibleObjects)
+		foreach (var obj in curObservedObjects)
 		{
 			if (!obj)
 			{
 				continue;
 			}
 
-			if (!allObservedObjects.Contains(obj))
+			if (!lastObservedObjects.Contains(obj))
 			{
-				// object enter this observer sight
-				visibleObjects.Add(obj);
 				obj.AddObserver(connectionToClient);
+			}
+		}
+
+		lastObservedObjects = curObservedObjects;
+	}
+
+	private void OnDrawGizmos()
+	{
+		if (!Application.isPlaying || !isServer)
+			return;
+
+		Gizmos.color = Color.green;
+
+		var visibleObjects = ProximityManager.Instance.GetVisibleObjects(transform.position, ViewRadius);
+
+		var viewerPos = transform.position;
+		foreach (var obj in visibleObjects)
+		{
+			if (obj)
+			{
+				var objPos = obj.transform.position;
+				Gizmos.DrawLine(viewerPos, objPos);
 			}
 		}
 	}

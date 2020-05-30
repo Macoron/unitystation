@@ -14,7 +14,7 @@ public class ProximityObject : NetworkBehaviour
 
 	private HashSet<NetworkConnection> proposedObservers
 		= new HashSet<NetworkConnection>();
-	private bool isDirty;
+	private bool isDirty = true;
 
 	[ServerCallback]
 	private void Start()
@@ -80,18 +80,19 @@ public class ProximityObject : NetworkBehaviour
 		// It would be ideal for game perfomance, but many of our logic based on messages
 		// So if message came to client, but won't find reciver it will create error and desync
 		// In future it should be fixed by migrating message and RPC logic to SyncVars
-		return true;
+		return false;
 	}
 
 	///<inheritdoc/>
 	public override bool OnRebuildObservers(HashSet<NetworkConnection> observers, bool initialize)
 	{
+		observers.Clear();
+
 		// add all proposed observers to mirror observers set
 		foreach (var obs in proposedObservers)
+		{
 			observers.Add(obs);
-
-		// clear proposed set - it will be updated next frame
-		proposedObservers.Clear();
+		}
 
 		// need to return true to override mirror build-in logic 
 		return true;
