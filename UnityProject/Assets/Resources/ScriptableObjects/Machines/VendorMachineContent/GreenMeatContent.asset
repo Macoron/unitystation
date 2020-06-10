@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b9c7bc0627d3ca4289dfb56fb2bc72d, type: 3}
-  m_Name: kitchen_1Content
+  m_Name: GreenMeatContent
   m_EditorClassIdentifier: 
   ContentList:
-  - Item: {fileID: 6532193109441330816, guid: 08f2ed80656ab8548b303e79671a18e8, type: 3}
+  - Item: {fileID: 6532193109441330816, guid: f4a7f2a5df1b98449bdf7af94d28ca29, type: 3}
     Stock: 5

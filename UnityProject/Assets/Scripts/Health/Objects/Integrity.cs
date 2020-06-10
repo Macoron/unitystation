@@ -78,6 +78,7 @@ public class Integrity : NetworkBehaviour, IHealth, IFireExposable, IRightClicka
 	/// Below this temperature (in Kelvin) the object will be unaffected by fire exposure.
 	/// </summary>
 	[Tooltip("Below this temperature (in Kelvin) the object will be unaffected by fire exposure.")]
+	[Temperature]
 	public float HeatResistance = 100;
 
 	public float initialIntegrity = 100f;
