@@ -229,7 +229,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialVendorContent:
+  InitialVendorContent: {fileID: 11400000, guid: 9755a89210721354c90fd75c9e2c803a,
+    type: 2}
+  InitialVendorContentList:
   - Item: {fileID: 8127442588295923452, guid: 706cc1f035332384c96f001de4760563, type: 3}
     Stock: 5
   - Item: {fileID: 6507000735928756314, guid: c8db81d5fc87fc5409a6f7c00e5ebc96, type: 3}
@@ -242,13 +244,7 @@ MonoBehaviour:
   VendingSound: MachineVend
   restockMessage: Items restocked.
   noAccessMessage: Access denied!
-  VendorContent:
-  - Item: {fileID: 8127442588295923452, guid: 706cc1f035332384c96f001de4760563, type: 3}
-    Stock: 5
-  - Item: {fileID: 6507000735928756314, guid: c8db81d5fc87fc5409a6f7c00e5ebc96, type: 3}
-    Stock: 1
-  - Item: {fileID: 6507000735928756314, guid: 66e26e048c0ee0448878c27b37dc685f, type: 3}
-    Stock: 2
+  currentContentList: []
 --- !u!114 &114778853778945220
 MonoBehaviour:
   m_ObjectHideFlags: 0

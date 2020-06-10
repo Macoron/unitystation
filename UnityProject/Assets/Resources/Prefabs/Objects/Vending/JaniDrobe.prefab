@@ -123,7 +123,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialVendorContent:
+  InitialVendorContent: {fileID: 11400000, guid: 4fb77671d070780419f75736f61d24e2,
+    type: 2}
+  InitialVendorContentList:
   - Item: {fileID: 3011710637427380133, guid: 8fd881065be8b411d84cfc10b38be725, type: 3}
     Stock: 2
   - Item: {fileID: 4011149429169960813, guid: cad85b5dad5b95d468fc34d2c6a01947, type: 3}
@@ -168,45 +170,7 @@ MonoBehaviour:
   VendingSound: MachineVend
   restockMessage: Items restocked.
   noAccessMessage: Access denied!
-  VendorContent:
-  - Item: {fileID: 3011710637427380133, guid: 8fd881065be8b411d84cfc10b38be725, type: 3}
-    Stock: 2
-  - Item: {fileID: 4011149429169960813, guid: cad85b5dad5b95d468fc34d2c6a01947, type: 3}
-    Stock: 2
-  - Item: {fileID: 2502055301998392637, guid: d77ca13e6df71a4468e5a524d3c698bc, type: 3}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 6373161644663410599, guid: 7cae22bda0476431ba677333bd759b73, type: 3}
-    Stock: 2
-  - Item: {fileID: 1454153603153415932, guid: bcf175e4b2e739a47a94808c336aaa33, type: 3}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 7781396554342910705, guid: bffa4f7b47979d445854af572064d36b, type: 3}
-    Stock: 2
-  - Item: {fileID: 5734849685452875998, guid: 6f371050bff8b32438f91c7c680900bb, type: 3}
-    Stock: 2
-  - Item: {fileID: 2419386692754613975, guid: 6603caafe8df84b4da1c797343cdf8c6, type: 3}
-    Stock: 6
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 6694482156107280369, guid: f9e1c882fbe2384428dd2e8cca1f375c, type: 3}
-    Stock: 2
-  - Item: {fileID: 359432221073519209, guid: 4dddcb74ff9a3ee4ca69bc6d757dca03, type: 3}
-    Stock: 2
-  - Item: {fileID: 7106618204054676533, guid: 7a2370ed5124e4897ba86392a2d9052b, type: 3}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 1069655924402247308, guid: 43a2f25b1176348c68d5d896d48d2fc6, type: 3}
-    Stock: 2
-  - Item: {fileID: 835768756810601639, guid: 357fbde8e937c49c6b4e0b33e089eb89, type: 3}
-    Stock: 2
+  currentContentList: []
 --- !u!114 &114744021291581812
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,9 +15,7 @@ public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpa
 	/// </summary>
 	private const float DispenseScatterRadius = 0.1f;
 
-	[FormerlySerializedAs("VendorContent")]
-	public List<VendorItem> InitialVendorContent = new List<VendorItem>();
-
+	public VendorMachineContent InitialVendorContent;
 	[Tooltip("Background color for UI")]
 	public Color HullColor = Color.white;
 
@@ -96,12 +94,18 @@ public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpa
 		}
 
 		VendorContent = new List<VendorItem>();
-		for (int i = 0; i < InitialVendorContent.Count; i++)
+		if (!InitialVendorContent)
+		{
+			return;
+		}
+
+		var initiallList = InitialVendorContent.ContentList;
+		for (int i = 0; i < initiallList.Count; i++)
 		{
 			//protects against missing references
-			if (InitialVendorContent[i] != null && InitialVendorContent[i].Item != null)
+			if (initiallList[i] != null && initiallList[i].Item != null)
 			{
-				VendorContent.Add(new VendorItem(InitialVendorContent[i]));
+				VendorContent.Add(new VendorItem(initiallList[i]));
 			}
 		}
 	}

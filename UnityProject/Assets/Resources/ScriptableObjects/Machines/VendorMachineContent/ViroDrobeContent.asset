@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b9c7bc0627d3ca4289dfb56fb2bc72d, type: 3}
+  m_Name: ViroDrobeContent
+  m_EditorClassIdentifier: 
+  ContentList:
+  - Item: {fileID: 0}
+    Stock: 2
+  - Item: {fileID: 9131202711572530880, guid: 0c198ac94169aed40ab72b2afc2d4cc5, type: 3}
+    Stock: 2
+  - Item: {fileID: 516347036442809227, guid: e128aa90b7c4cd741bc16b385d99f54a, type: 3}
+    Stock: 2
+  - Item: {fileID: 7106618204054676533, guid: 33d5403cf4de64f558d4b1735fdf85b4, type: 3}
+    Stock: 2
+  - Item: {fileID: 3011710637427380133, guid: aab6051d13dac4be8a3ca172d9b74051, type: 3}
+    Stock: 2
+  - Item: {fileID: 4172758320385125961, guid: 7294d72d86040fa45a54a16e2c0a36bf, type: 3}
+    Stock: 2
+  - Item: {fileID: 7374481989050852271, guid: 22ce62e388fa84ff098d72a7856ea506, type: 3}
+    Stock: 2
+  - Item: {fileID: 6404652678407139925, guid: e9076ebebbcd65e56b189cd1a837d018, type: 3}
+    Stock: 2
+  - Item: {fileID: 835768756810601639, guid: cad7d826b673041f5b2b4d9b9d64aa09, type: 3}
+    Stock: 2

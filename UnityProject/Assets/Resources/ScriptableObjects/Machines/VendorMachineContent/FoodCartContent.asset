@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b9c7bc0627d3ca4289dfb56fb2bc72d, type: 3}
+  m_Name: FoodCartContent
+  m_EditorClassIdentifier: 
+  ContentList:
+  - Item: {fileID: 6532193109441330816, guid: f5b3ac01c1928bf4ab03433000e00ca2, type: 3}
+    Stock: 2
+  - Item: {fileID: 6546673936360135170, guid: 9df8b42a3b7c7554ab9c48ba64b45d2e, type: 3}
+    Stock: 5

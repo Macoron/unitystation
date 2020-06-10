@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b9c7bc0627d3ca4289dfb56fb2bc72d, type: 3}
   m_Name: BarDrobeContent
   m_EditorClassIdentifier: 
-  InitialVendorContent:
+  ContentList:
   - Item: {fileID: 7636118406116123594, guid: 489b0e24de7b7dc4ea31a401aadb3779, type: 3}
     Stock: 2
   - Item: {fileID: 835768756810601639, guid: 357fbde8e937c49c6b4e0b33e089eb89, type: 3}

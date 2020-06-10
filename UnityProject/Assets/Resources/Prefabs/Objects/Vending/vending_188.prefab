@@ -121,7 +121,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VendorContent:
+  InitialVendorContent: {fileID: 11400000, guid: a168c2afc1381c34d84fa03e2fdd323b,
+    type: 2}
+  InitialVendorContentList:
   - Item: {fileID: 4188245363048309518, guid: da93b0f7c392d46ba85123e2516cfa49, type: 3}
     Stock: 5
   - Item: {fileID: 3011710637427380133, guid: 5a4f48d58142749de92013eb1e1d0523, type: 3}
@@ -131,6 +133,10 @@ MonoBehaviour:
   HullColor: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
   EjectObjects: 0
   EjectDirection: 0
+  VendingSound: MachineVend
+  restockMessage: Items restocked.
+  noAccessMessage: Access denied!
+  currentContentList: []
 --- !u!114 &114331300456246542
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,6 +169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  snapToGridOnStart: 1
   IsFixedMatrix: 0
 --- !u!114 &8419963642986560554
 MonoBehaviour:
@@ -275,9 +282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62cc3ef7cd9082443aaf3c255851d15a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  forceHidden: 0
 --- !u!1 &1668304983400538
 GameObject:
   m_ObjectHideFlags: 0

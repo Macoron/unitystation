@@ -123,7 +123,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialVendorContent:
+  InitialVendorContent: {fileID: 11400000, guid: 3d1a418f4aee629498321c6c1023eec3,
+    type: 2}
+  InitialVendorContentList:
   - Item: {fileID: 3011710637427380133, guid: 05d3054c3617b467ea8e086e2969e172, type: 3}
     Stock: 2
   - Item: {fileID: 2283914521931275349, guid: a925b6dda477c1148bfd2997307dec63, type: 3}
@@ -146,23 +148,7 @@ MonoBehaviour:
   VendingSound: MachineVend
   restockMessage: Items restocked.
   noAccessMessage: Access denied!
-  VendorContent:
-  - Item: {fileID: 3011710637427380133, guid: 05d3054c3617b467ea8e086e2969e172, type: 3}
-    Stock: 2
-  - Item: {fileID: 2283914521931275349, guid: a925b6dda477c1148bfd2997307dec63, type: 3}
-    Stock: 2
-  - Item: {fileID: 7106618204054676533, guid: 33d5403cf4de64f558d4b1735fdf85b4, type: 3}
-    Stock: 2
-  - Item: {fileID: 7374481989050852271, guid: 1eabf8d0cc67b4d04926dd8eb07bf946, type: 3}
-    Stock: 2
-  - Item: {fileID: 8541207335635205697, guid: 3eb130e231b60914a8b231815835140b, type: 3}
-    Stock: 2
-  - Item: {fileID: 4322743953814334108, guid: 1bc887b434113ae4781d4604fb619175, type: 3}
-    Stock: 2
-  - Item: {fileID: 835768756810601639, guid: 34a45eaa0bb60420f8e508486a85c92f, type: 3}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
+  currentContentList: []
 --- !u!114 &114744021291581812
 MonoBehaviour:
   m_ObjectHideFlags: 0

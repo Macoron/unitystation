@@ -123,7 +123,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialVendorContent:
+  InitialVendorContent: {fileID: 11400000, guid: 96c4100741a0d3f4b804acb9b3609362,
+    type: 2}
+  InitialVendorContentList:
   - Item: {fileID: 8734328976324889014, guid: 83442ea1bc97ef04db1f9962a2f7021d, type: 3}
     Stock: 4
   - Item: {fileID: 0}
@@ -168,45 +170,7 @@ MonoBehaviour:
   VendingSound: MachineVend
   restockMessage: Items restocked.
   noAccessMessage: Access denied!
-  VendorContent:
-  - Item: {fileID: 8734328976324889014, guid: 83442ea1bc97ef04db1f9962a2f7021d, type: 3}
-    Stock: 4
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 1
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 2
-  - Item: {fileID: 3011710637427380133, guid: aacc30d5087d94ec7a4764c686da7e57, type: 3}
-    Stock: 2
-  - Item: {fileID: 8634698533066501967, guid: 47d960509ca10d34da540dc8029ffece, type: 3}
-    Stock: 2
-  - Item: {fileID: 6127118939752068930, guid: b9ea9931e8b07a140ab790d555cace98, type: 3}
-    Stock: 2
-  - Item: {fileID: 2834735550645104383, guid: 51fa4efb14c93714ea1ff2121835d6cc, type: 3}
-    Stock: 2
-  - Item: {fileID: 6532394448030161815, guid: 70e762212c1501d49bbcd7004162631a, type: 3}
-    Stock: 2
-  - Item: {fileID: 1231553946908593111, guid: 0c4edd45da8bda84b8ffa10e660ce6f4, type: 3}
-    Stock: 2
-  - Item: {fileID: 9001442491608015058, guid: bed6dd4c42e234f4180cfa233fcf9027, type: 3}
-    Stock: 1
-  - Item: {fileID: 2054783994787064243, guid: 64532b0908b2c1c40a11a32ef95e5a5d, type: 3}
-    Stock: 1
-  - Item: {fileID: 0}
-    Stock: 1
-  - Item: {fileID: 3431291279286482953, guid: e7c66dc6818ee2e4e8a12a7fbfa0a374, type: 3}
-    Stock: 2
-  - Item: {fileID: 7025772132153801043, guid: b7680266b91b6d141a4f255aefb9cf2d, type: 3}
-    Stock: 1
-  - Item: {fileID: 835768756810601639, guid: 357fbde8e937c49c6b4e0b33e089eb89, type: 3}
-    Stock: 2
-  - Item: {fileID: 0}
-    Stock: 1
+  currentContentList: []
 --- !u!114 &114744021291581812
 MonoBehaviour:
   m_ObjectHideFlags: 0
