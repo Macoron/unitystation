@@ -53,7 +53,20 @@ public class ArrayElementTitleDrawer : PropertyDrawer
             case SerializedPropertyType.Color:
                 return TitleNameProp.colorValue.ToString();
             case SerializedPropertyType.ObjectReference:
-                return TitleNameProp.objectReferenceValue == null ? Atribute.Nullname : TitleNameProp.objectReferenceValue.ToString();
+				{
+					if (!TitleNameProp.objectReferenceValue)
+					{
+						return Atribute.Nullname;
+					}
+					else if (TitleNameProp.objectReferenceValue is GameObject)
+					{
+						var goRef = TitleNameProp.objectReferenceValue as GameObject;
+						return TextUtils.UppercaseFirst(goRef.ExpensiveName());
+					}
+
+					return TitleNameProp.objectReferenceValue.ToString();
+				}
+                
             case SerializedPropertyType.LayerMask:
                 break;
             case SerializedPropertyType.Enum:

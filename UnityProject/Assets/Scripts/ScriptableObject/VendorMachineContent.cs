@@ -22,5 +22,6 @@ public class VendorItem
 [CreateAssetMenu(fileName = "VendorMachineContent", menuName = "ScriptableObjects/Machines/VendorMachineContent")]
 public class VendorMachineContent : ScriptableObject
 {
-	public List<VendorItem> InitialVendorContent = new List<VendorItem>();
+	[ArrayElementTitle("Item")]
+	public List<VendorItem> ContentList = new List<VendorItem>();
 }
