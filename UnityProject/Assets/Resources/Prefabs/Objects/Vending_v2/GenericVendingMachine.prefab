@@ -132,6 +132,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NetTabType: 0
+--- !u!114 &3942653339937167680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7514098956370357605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d26588af0c1441b29b5dd75c5c0e2ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  wiresInitiallyExposed: 0
+  nodeInfo: {fileID: 11400000, guid: 70468a705c81370488f44537a6568005, type: 2}
+  openPanelSFX: screwdriver1
+  closePanelSFX: screwdriver1
+  NetTabType: 19
 --- !u!114 &6113589334367613250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +167,23 @@ MonoBehaviour:
   syncInterval: 0.1
   secondsToSecure: 2
   secondsToUnsecure: 2
+--- !u!114 &1606788206546109964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7514098956370357605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdce8a163088453ca593c0e98f2c5f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemStorageStructure: {fileID: 11400000, guid: ad3502dbb5202e64ab70b125dba1335c,
+    type: 2}
+  itemStorageCapacity: {fileID: 11400000, guid: 15e4795bbc71b044ea2a69dc1c89f1d4,
+    type: 2}
+  itemStoragePopulator: {fileID: 0}
 --- !u!114 &3655155378721799335
 MonoBehaviour:
   m_ObjectHideFlags: 0
