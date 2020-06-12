@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17f00df4f4795324a9d1fea1458b31df, type: 3}
+  m_Name: VendorNodes
+  m_EditorClassIdentifier: 
+  nodeInfoList:
+  - InternalIdentifier: MainPowerSource
+    IsInput: 0
+    IsOutput: 1
+    IsDeviceNode: 0
+    HiddenLabel: MainPowerSource
+    PublicLabel: q
+    Description: If both power sources not connected to any input, vendor machine
+      doesn't function at all. By default connected with PowerStabilization.
+  - InternalIdentifier: SecondPowerSource
+    IsInput: 0
+    IsOutput: 1
+    IsDeviceNode: 0
+    HiddenLabel: SecondPowerSource
+    PublicLabel: s
+    Description: Same as MainPowerSource. By default connected with ContrabandBlocker.
+  - InternalIdentifier: OnIDAccepted
+    IsInput: 0
+    IsOutput: 1
+    IsDeviceNode: 0
+    HiddenLabel: OnIDAccepted
+    PublicLabel: k
+    Description: Activates when player select item by vendor UI and has valid ID.
+  - InternalIdentifier: OnIDRejected
+    IsInput: 0
+    IsOutput: 1
+    IsDeviceNode: 0
+    HiddenLabel: OnIDRejected
+    PublicLabel: l
+    Description: Activates when player select item by vendor UI, but doesn't have
+      valid ID.
+  - InternalIdentifier: PowerStabilization
+    IsInput: 1
+    IsOutput: 0
+    IsDeviceNode: 0
+    HiddenLabel: PowerStabilization (Electrocution)
+    PublicLabel: p
+    Description: If connected to anything except MainPowerSource or ScondPowerSource,
+      vendor machine will electrocute user.
+  - InternalIdentifier: ContrabandBlocker
+    IsInput: 1
+    IsOutput: 0
+    IsDeviceNode: 0
+    HiddenLabel: ContrabandBlocker
+    PublicLabel: c
+    Description: If connected to power source, will hide any contraband item from
+      vendors list
+  - InternalIdentifier: DispenseItem
+    IsInput: 1
+    IsOutput: 0
+    IsDeviceNode: 0
+    HiddenLabel: DispenseItem
+    PublicLabel: d
+    Description: Dispense selected item by user. If no item was selected, will throw
+      item in random direction and possibly hit player.
+  - InternalIdentifier: RejectID
+    IsInput: 1
+    IsOutput: 0
+    IsDeviceNode: 0
+    HiddenLabel: RejectID
+    PublicLabel: r
+    Description: Prints access denied message to the player

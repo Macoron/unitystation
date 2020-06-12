@@ -16,6 +16,10 @@ public class HackingNodeInfo
 
 	[Tooltip("What label the players see when they view the hacking UI.")]
 	public string PublicLabel = "";
+
+	[Tooltip("Optional OOC description for developers")]
+	[TextArea]
+	public string Description;
 }
 
 [CreateAssetMenu(fileName = "HackingNodeInfo", menuName = "ScriptableObjects/HackingNodeInfo", order = 1)]
