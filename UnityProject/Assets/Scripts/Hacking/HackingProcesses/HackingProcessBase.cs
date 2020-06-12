@@ -106,7 +106,53 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 	}
 
 
-	public abstract void ServerLinkHackingNodes();
+	public virtual void ServerLinkHackingNodes()
+	{
+		// connect all nodes according to nodeInfo
+		if (nodeInfo)
+		{
+			// get all conections from node info
+			var connections = nodeInfo.connections.ToArray();
+
+			// shuffle them in random order
+			connections = Shuffle(connections);
+
+			// connect nodes
+			foreach (var pair in connections)
+			{
+				var node1ID = pair.Key;
+				var node2ID = pair.Value;
+
+				var node1 = GetNodeWithInternalIdentifier(node1ID);
+				if (node1 == null)
+				{
+					Logger.LogError($"Unknown node {node1ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
+					continue;
+				}
+
+				var node2 = GetNodeWithInternalIdentifier(node2ID);
+				if (node2 == null)
+				{
+					Logger.LogError($"Unknown node {node2ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
+					continue;
+				}
+
+				node1.AddConnectedNode(node2);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Shuffle connections in random order. 
+	/// Uses round seed to stay same for same connections count.
+	/// </summary>
+	private KeyValuePair<string, string>[] Shuffle(KeyValuePair<string, string>[]  connections)
+	{
+		var seed = GameManager.Instance.RoundSeed;
+		var rng = new System.Random(seed);
+
+		return connections.OrderBy((p) => rng.Next()).ToArray();
+	}
 
 	public virtual void ServerGenerateNodesFromNodeInfo()
 	{
@@ -141,7 +187,7 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 
 	public HackingNode GetNodeWithInternalIdentifier(string identifier)
 	{
-		return hackNodes.Find(x => x.InternalIdentifier.Equals(identifier));
+		return hackNodes.FirstOrDefault(x => x.InternalIdentifier.Equals(identifier));
 	}
 
 	/// <summary>

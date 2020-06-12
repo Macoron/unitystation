@@ -105,6 +105,12 @@ public class HackingNode
 
 	public virtual void AddConnectedNode(HackingNode node)
 	{
+		if (node == this)
+		{
+			Logger.LogError($"Can't connect {node.HiddenLabel} to itself!", Category.Hacking);
+			return;
+		}
+
 		connectedInputNodes.Add(node);
 	}
 

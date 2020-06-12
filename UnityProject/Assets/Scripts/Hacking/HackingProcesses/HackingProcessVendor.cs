@@ -51,10 +51,6 @@ public class HackingProcessVendor : HackingProcessBase
 		}
 	}
 
-	public override void ServerLinkHackingNodes()
-	{
-	}
-
 	protected override void OnWiresExposed()
 	{
 		base.OnWiresExposed();

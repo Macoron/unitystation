@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 [System.Serializable]
 public class HackingNodeInfo
@@ -26,4 +27,13 @@ public class HackingNodeInfo
 public class HackingNodeList : ScriptableObject
 {
 	public List<HackingNodeInfo> nodeInfoList;
+
+	public NodeConnectionsDictionary connections;
+}
+
+[System.Serializable]
+public class NodeConnectionsDictionary
+	: SerializableDictionary<string, string>
+{
+
 }

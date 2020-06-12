@@ -74,3 +74,14 @@ MonoBehaviour:
     HiddenLabel: RejectID
     PublicLabel: r
     Description: Prints access denied message to the player
+  connections:
+    m_keys:
+    - MainPowerSource
+    - SecondPowerSource
+    - OnIDAccepted
+    - OnIDRejected
+    m_values:
+    - PowerStabilization
+    - ContrabandBlocker
+    - DispenseItem
+    - RejectID

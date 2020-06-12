@@ -167,7 +167,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   wiresInitiallyExposed: 0
-  nodeInfo: {fileID: 11400000, guid: 70468a705c81370488f44537a6568005, type: 2}
+  nodeInfo: {fileID: 11400000, guid: a0bf15fb313294b43a9e86736109d6ef, type: 2}
   openPanelSFX: screwdriver1
   closePanelSFX: screwdriver1
   NetTabType: 19

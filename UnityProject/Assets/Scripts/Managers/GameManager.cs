@@ -61,6 +61,12 @@ public partial class GameManager : MonoBehaviour
 	public DateTime stationTime;
 	public int RoundsPerMap = 10;
 
+	/// <summary>
+	/// Random number that updates each round
+	/// Useful if some random need to be exactly same on one round
+	/// </summary>
+	public int RoundSeed { get; private set; }
+
 	//Space bodies in the solar system <Only populated ServerSide>:
 	//---------------------------------
 	public List<MatrixMove> SpaceBodies = new List<MatrixMove>();
@@ -310,6 +316,9 @@ public partial class GameManager : MonoBehaviour
 	{
 		if (CustomNetworkManager.Instance._isServer)
 		{
+			// Update round seed
+			RoundSeed = UnityEngine.Random.Range(0, 10000);
+
 			// Clear up any space bodies
 			SpaceBodies.Clear();
 			PendingSpaceBodies = new Queue<MatrixMove>();
