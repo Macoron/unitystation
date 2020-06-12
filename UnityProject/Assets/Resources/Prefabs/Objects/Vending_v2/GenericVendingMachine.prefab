@@ -110,15 +110,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed381a72f1e344bb8020dc181414b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   InitialVendorContent: {fileID: 11400000, guid: 04ae4b40233e3fc458cf3bbfa3bf2cda,
     type: 2}
   HullColor: {r: 1, g: 1, b: 1, a: 1}
   EjectObjects: 0
   EjectDirection: 0
   VendingSound: MachineVend
+  MinIntegrityPercent: 0.3
   restockMessage: Items restocked.
   noAccessMessage: Access denied!
   VendorContent: []
+--- !u!114 &1606788206546109964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7514098956370357605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdce8a163088453ca593c0e98f2c5f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemStorageStructure: {fileID: 11400000, guid: ad3502dbb5202e64ab70b125dba1335c,
+    type: 2}
+  itemStorageCapacity: {fileID: 11400000, guid: 15e4795bbc71b044ea2a69dc1c89f1d4,
+    type: 2}
+  itemStoragePopulator: {fileID: 0}
 --- !u!114 &2816344950847839677
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,6 +171,7 @@ MonoBehaviour:
   openPanelSFX: screwdriver1
   closePanelSFX: screwdriver1
   NetTabType: 19
+  MaintancePanelSprite: {fileID: 459318821315237965}
 --- !u!114 &6113589334367613250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,7 +188,7 @@ MonoBehaviour:
   syncInterval: 0.1
   secondsToSecure: 2
   secondsToUnsecure: 2
---- !u!114 &1606788206546109964
+--- !u!114 &7277165564324680153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,14 +197,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7514098956370357605}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdce8a163088453ca593c0e98f2c5f07, type: 3}
+  m_Script: {fileID: 11500000, guid: b0fab4331e7b127448ad72142fc1779b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemStorageStructure: {fileID: 11400000, guid: ad3502dbb5202e64ab70b125dba1335c,
-    type: 2}
-  itemStorageCapacity: {fileID: 11400000, guid: 15e4795bbc71b044ea2a69dc1c89f1d4,
-    type: 2}
-  itemStoragePopulator: {fileID: 0}
+  SpriteHandler: {fileID: 3655155378721799335}
+  ScreenGlow: {fileID: 5397724688727589537}
 --- !u!114 &3655155378721799335
 MonoBehaviour:
   m_ObjectHideFlags: 0

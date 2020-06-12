@@ -1,14 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using Mirror;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+
+public enum VendorState
+{
+	POWERED = 0,
+	OFF = 1,
+	BROKEN = 2
+}
 
 /// <summary>
 /// Main component for vending machine object (UI logic is in GUI_Vendor). Allows restocking
 /// when clicking on vendor with a VendingRestock item in hand.
 /// </summary>
 [RequireComponent(typeof(HasNetworkTab))]
-public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpawn
+public class Vendor : NetworkBehaviour, ICheckedInteractable<HandApply>, IServerSpawn
 {
 	/// <summary>
 	/// Scatter spawned items a bit to not allow stacking in one position
@@ -29,6 +37,10 @@ public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpa
 	[Tooltip("Sound when object vends from vendor")]
 	public string VendingSound = "MachineVend";
 
+	[Tooltip("If integrity bellow this level, vendomat will become broken")]
+	[Range(0f, 1f)]
+	public float MinIntegrityPercent = 0.3f;
+
 	[Header("Text messages")]
 	[SerializeField]
 	private string restockMessage = "Items restocked.";
@@ -39,9 +51,14 @@ public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpa
 	public List<VendorItem> VendorContent = new List<VendorItem>();
 
 	private AccessRestrictions accessRestrictions;
+	private Integrity integrity;
+
+	[SyncVar(hook = "OnStateUpdatedClient")]
+	private VendorState state = VendorState.POWERED;
 
 	public VendorUpdateEvent OnRestockUsed = new VendorUpdateEvent();
 	public VendorItemUpdateEvent OnItemVended = new VendorItemUpdateEvent();
+	public VendorStateUpdateEvent OnVendorStateUpdatedClient = new VendorStateUpdateEvent();
 
 	private void Awake()
 	{
@@ -54,12 +71,47 @@ public class Vendor : MonoBehaviour, ICheckedInteractable<HandApply>, IServerSpa
 		}
 
 		accessRestrictions = GetComponent<AccessRestrictions>();
+		integrity = GetComponent<Integrity>();
+
+		// subscribe to events
+		if (integrity)
+		{
+			integrity.OnApllyDamage.AddListener((dmg) => UpdateState());
+		}
 	}
 
 	public void OnSpawnServer(SpawnInfo info)
 	{
 		// reset vendor content to initial value
 		ResetContentList();
+		UpdateState();
+	}
+
+	private void UpdateState()
+	{
+		// check if integrity reached minimal broke level
+		if (state != VendorState.BROKEN)
+		{
+			if (integrity && integrity.integrity > 0f)
+			{
+				var minIntegrity = integrity.initialIntegrity * MinIntegrityPercent;
+				if (integrity.integrity < minIntegrity)
+				{
+					// we broke vendomat compeletely
+					state = VendorState.BROKEN;
+				}
+			}
+		}
+		else
+		{
+			// looks like vendor works fine
+			state = VendorState.POWERED;
+		}
+	}
+
+	private void OnStateUpdatedClient(VendorState oldState, VendorState newState)
+	{
+		OnVendorStateUpdatedClient.Invoke(newState);
 	}
 
 	public bool WillInteract(HandApply interaction, NetworkSide side)
@@ -232,3 +284,5 @@ public enum EjectDirection { None, Up, Down, Random }
 public class VendorUpdateEvent: UnityEvent {}
 
 public class VendorItemUpdateEvent : UnityEvent<VendorItem> { }
+
+public class VendorStateUpdateEvent : UnityEvent<VendorState> { }

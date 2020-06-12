@@ -5,6 +5,7 @@ using UnityEngine;
 public class HackingProcessVendor : HackingProcessBase
 {
 	public NetTabType NetTabType = NetTabType.HackingPanel;
+	public SpriteRenderer MaintancePanelSprite;
 
 	public override bool WillInteract(HandApply interaction, NetworkSide side)
 	{
@@ -38,10 +39,32 @@ public class HackingProcessVendor : HackingProcessBase
 				ToggleWiresExposed();
 			}
 		}
+
+		//Do specific things when the wires are exposed.
+		if (WiresExposed)
+		{
+			if (interaction.HandObject == null && interaction.Performer != null)
+			{
+				TabUpdateMessage.Send(interaction.Performer, gameObject, NetTabType, TabAction.Open);
+				return;
+			}
+		}
 	}
 
 	public override void ServerLinkHackingNodes()
 	{
+	}
+
+	protected override void OnWiresExposed()
+	{
+		base.OnWiresExposed();
+		MaintancePanelSprite?.gameObject.SetActive(true);
+	}
+
+	protected override void OnWiresHidden()
+	{
+		base.OnWiresHidden();
+		MaintancePanelSprite?.gameObject.SetActive(false);
 	}
 
 	public override void OnDespawnServer(DespawnInfo info)
