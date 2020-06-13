@@ -18,6 +18,9 @@ public class HackingNodeInfo
 	[Tooltip("What label the players see when they view the hacking UI.")]
 	public string PublicLabel = "";
 
+	[Tooltip("Will node electrocute player after cutting connected cable")]
+	public bool IsElectrocute;
+
 	[Tooltip("Optional OOC description for developers")]
 	[TextArea]
 	public string Description;

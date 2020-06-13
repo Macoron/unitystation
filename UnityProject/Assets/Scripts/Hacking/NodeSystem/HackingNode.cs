@@ -28,9 +28,12 @@ public class HackingNode
 
 	public bool IsDeviceNode { get; set; }
 
+	public bool IsElectrocute { get; set; }
+
 	private List<HackingNode> connectedInputNodes = new List<HackingNode>();
 
 	public List<HackingNode> ConnectedInputNodes => connectedInputNodes;
+
 
 
 	public Action<GameObject> inputCallBacks;

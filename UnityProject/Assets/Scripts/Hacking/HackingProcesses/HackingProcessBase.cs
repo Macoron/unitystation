@@ -143,17 +143,8 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 	}
 
 	/// <summary>
-	/// Shuffle connections in random order. 
-	/// Uses round seed to stay same for same connections count.
+	/// Generate nodes from scriptable object and add them to internal node list
 	/// </summary>
-	private KeyValuePair<string, string>[] Shuffle(KeyValuePair<string, string>[]  connections)
-	{
-		var seed = GameManager.Instance.RoundSeed;
-		var rng = new System.Random(seed);
-
-		return connections.OrderBy((p) => rng.Next()).ToArray();
-	}
-
 	public virtual void ServerGenerateNodesFromNodeInfo()
 	{
 		foreach (HackingNodeInfo inf in nodeInfo.nodeInfoList)
@@ -165,6 +156,12 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 			newNode.InternalIdentifier = inf.InternalIdentifier;
 			newNode.HiddenLabel = inf.HiddenLabel;
 			newNode.PublicLabel = inf.PublicLabel;
+			newNode.IsElectrocute = inf.IsElectrocute;
+
+			if (newNode.IsElectrocute)
+			{
+				newNode.AddWireCutCallback(ServerElectrocute);
+			}
 
 			hackNodes.Add(newNode);
 		}
@@ -414,11 +411,18 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 		int outIndex = connection[0];
 		int inIndex = connection[1];
 
-		HackingNode node = hackNodes[outIndex];
-		if (node != null)
+		HackingNode outNode = hackNodes[outIndex];
+		if (outNode != null)
 		{
-			node.WireCutCallback(player.gameObject);
+			outNode.WireCutCallback(player.gameObject);
 		}
+
+		HackingNode inNode = hackNodes[inIndex];
+		if (outNode != null)
+		{
+			inNode.WireCutCallback(player.gameObject);
+		}
+
 		RemoveNodeConnection(connection);
 	}
 
@@ -497,5 +501,33 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 		}
 	}
 
+	public virtual void ServerElectrocute(GameObject playerGO)
+	{
+		float r = UnityEngine.Random.value;
+		if (r < 0.45)
+		{
+			PlayerScript ply = playerGO.GetComponent<PlayerScript>();
+			if (ply != null)
+			{
+				HackingGUI.RemovePlayer(ply.gameObject);
+				TabUpdateMessage.Send(ply.gameObject, HackingGUI.Provider, NetTabType.HackingPanel, TabAction.Close);
+				var playerLHB = playerGO.GetComponent<LivingHealthBehaviour>();
+				var electrocution = new Electrocution(9000f, gameObject.WorldPosServer(), "wire");
+				if (playerLHB != null) playerLHB.Electrocute(electrocution);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Shuffle connections in random order. 
+	/// Uses round seed to stay same for same connections count.
+	/// </summary>
+	private KeyValuePair<string, string>[] Shuffle(KeyValuePair<string, string>[] connections)
+	{
+		var seed = GameManager.Instance.RoundSeed;
+		var rng = new System.Random(seed);
+
+		return connections.OrderBy((p) => rng.Next()).ToArray();
+	}
 }
 

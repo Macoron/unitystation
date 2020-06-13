@@ -19,117 +19,160 @@ MonoBehaviour:
     IsDeviceNode: 0
     HiddenLabel: OnAttemptOpen
     PublicLabel: a
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnAttemptClose
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnAttemptClose
     PublicLabel: b
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: BeginOpenProcedure
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: BeginOpenProcedure
     PublicLabel: c
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: BeginCloseProcedure
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: BeginCloseProcedure
     PublicLabel: d
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnShouldOpen
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnShouldOpen
     PublicLabel: e
+    IsElectrocute: 1
+    Description: 
   - InternalIdentifier: OnShouldClose
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnShouldClose
     PublicLabel: f
+    IsElectrocute: 1
+    Description: 
   - InternalIdentifier: OpenDoor
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: OpenDoor
     PublicLabel: g
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: CloseDoor
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: CloseDoor
     PublicLabel: h
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnDoorOpened
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnDoorOpened
     PublicLabel: i
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnDoorClosed
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnDoorClosed
     PublicLabel: j
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnIDAccepted
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnIDAccepted
     PublicLabel: k
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: OnIDRejected
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: OnIDRejected
     PublicLabel: l
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: AcceptId
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: AcceptId
     PublicLabel: m
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: RejectID
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: RejectID
     PublicLabel: n
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: ShouldDoPressureWarning
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: ShouldDoPressureWarning
     PublicLabel: o
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: DoPressureWarning
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: DoPressureWarning
     PublicLabel: p
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: PowerOut
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: PowerOut
     PublicLabel: q
+    IsElectrocute: 1
+    Description: 
   - InternalIdentifier: PowerIn
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: PowerIn
     PublicLabel: r
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: DummyOut
     IsInput: 0
     IsOutput: 1
     IsDeviceNode: 0
     HiddenLabel: DummyOut
     PublicLabel: s
+    IsElectrocute: 0
+    Description: 
   - InternalIdentifier: DummyIn
     IsInput: 1
     IsOutput: 0
     IsDeviceNode: 0
     HiddenLabel: DummyIn
     PublicLabel: t
+    IsElectrocute: 0
+    Description: 
+  connections:
+    m_keys: []
+    m_values: []

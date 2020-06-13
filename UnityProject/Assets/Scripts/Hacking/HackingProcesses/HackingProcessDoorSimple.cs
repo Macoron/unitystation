@@ -160,6 +160,11 @@ public class HackingProcessDoorSimple : HackingProcessBase
 			newNode.IsDeviceNode = inf.IsDeviceNode;
 			newNode.PublicLabel = inf.PublicLabel;
 
+			if (newNode.IsElectrocute)
+			{
+				newNode.AddWireCutCallback(ServerElectrocute);
+			}
+
 			if (inf.IsInput)
 			{
 				inputNodes.Add(newNode);

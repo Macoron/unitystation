@@ -63,6 +63,14 @@ public class HackingProcessVendor : HackingProcessBase
 		MaintancePanelSprite?.gameObject.SetActive(false);
 	}
 
+	public override void ServerLinkHackingNodes()
+	{
+		base.ServerLinkHackingNodes();
+
+		var mainPowerSource = GetNodeWithInternalIdentifier("MainPowerSource");
+		var secondPowerSource = GetNodeWithInternalIdentifier("SecondPowerSource");
+	}
+
 	public override void OnDespawnServer(DespawnInfo info)
 	{
 		NetworkTabManager.Instance.RemoveTab(gameObject, NetTabType);

@@ -518,24 +518,6 @@ public class DoorController : NetworkBehaviour, IServerSpawn
 		}
 	}
 
-	private void ServerElectrocute(GameObject obj)
-	{
-		float r = UnityEngine.Random.value;
-		if (r < 0.45)
-		{
-			PlayerScript ply = obj.GetComponent<PlayerScript>();
-			if (ply != null)
-			{
-				hackingProcess.HackingGUI.RemovePlayer(ply.gameObject);
-				TabUpdateMessage.Send(ply.gameObject, hackingProcess.HackingGUI.Provider, NetTabType.HackingPanel, TabAction.Close);
-				var playerLHB = obj.GetComponent<LivingHealthBehaviour>();
-				var electrocution = new Electrocution(9080, registerTile.WorldPositionServer, "wire");
-				if (playerLHB != null) playerLHB.Electrocute(electrocution);
-			}
-		}
-
-	}
-
 	public void LinkHackNodes()
 	{
 
@@ -558,11 +540,9 @@ public class DoorController : NetworkBehaviour, IServerSpawn
 		onAttemptClose.AddConnectedNode(beginCloseProcedure);
 
 		HackingNode onShouldOpen = hackingProcess.GetNodeWithInternalIdentifier("OnShouldOpen");
-		onShouldOpen.AddWireCutCallback(ServerElectrocute);
 		onShouldOpen.AddConnectedNode(openDoor);
 
 		HackingNode onShouldClose = hackingProcess.GetNodeWithInternalIdentifier("OnShouldClose");
-		onShouldClose.AddWireCutCallback(ServerElectrocute);
 		onShouldClose.AddConnectedNode(closeDoor);
 
 		HackingNode acceptID = hackingProcess.GetNodeWithInternalIdentifier("AcceptId");
@@ -587,7 +567,6 @@ public class DoorController : NetworkBehaviour, IServerSpawn
 
 		HackingNode powerOut = hackingProcess.GetNodeWithInternalIdentifier("PowerOut");
 		powerOut.AddConnectedNode(powerIn);
-		powerOut.AddWireCutCallback(ServerElectrocute);
 
 		HackingNode dummyIn = hackingProcess.GetNodeWithInternalIdentifier("DummyIn");
 
