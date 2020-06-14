@@ -520,7 +520,6 @@ public class DoorController : NetworkBehaviour, IServerSpawn
 
 	public void LinkHackNodes()
 	{
-
 		HackingNode openDoor = hackingProcess.GetNodeWithInternalIdentifier("OpenDoor");
 		openDoor.AddToInputMethods(ServerOpen);
 
@@ -533,45 +532,11 @@ public class DoorController : NetworkBehaviour, IServerSpawn
 		HackingNode beginCloseProcedure = hackingProcess.GetNodeWithInternalIdentifier("BeginCloseProcedure");
 		beginCloseProcedure.AddToInputMethods(ServerTryClose);
 
-		HackingNode onAttemptOpen = hackingProcess.GetNodeWithInternalIdentifier("OnAttemptOpen");
-		onAttemptOpen.AddConnectedNode(beginOpenProcedure);
-
-		HackingNode onAttemptClose = hackingProcess.GetNodeWithInternalIdentifier("OnAttemptClose");
-		onAttemptClose.AddConnectedNode(beginCloseProcedure);
-
-		HackingNode onShouldOpen = hackingProcess.GetNodeWithInternalIdentifier("OnShouldOpen");
-		onShouldOpen.AddConnectedNode(openDoor);
-
-		HackingNode onShouldClose = hackingProcess.GetNodeWithInternalIdentifier("OnShouldClose");
-		onShouldClose.AddConnectedNode(closeDoor);
-
-		HackingNode acceptID = hackingProcess.GetNodeWithInternalIdentifier("AcceptId");
-
 		HackingNode rejectID = hackingProcess.GetNodeWithInternalIdentifier("RejectID");
 		rejectID.AddToInputMethods(ServerAccessDenied);
 
-		HackingNode onIDRejected = hackingProcess.GetNodeWithInternalIdentifier("OnIDRejected");
-		onIDRejected.AddConnectedNode(rejectID);
-
 		HackingNode doPressureWarning = hackingProcess.GetNodeWithInternalIdentifier("DoPressureWarning");
 		doPressureWarning.AddToInputMethods(ServerPressureWarn);
-
-		HackingNode shouldDoPressureWarning = hackingProcess.GetNodeWithInternalIdentifier("ShouldDoPressureWarning");
-		shouldDoPressureWarning.AddConnectedNode(doPressureWarning);
-
-		HackingNode onDoorOpened = hackingProcess.GetNodeWithInternalIdentifier("OnDoorOpened");
-
-		HackingNode onDoorClosed = hackingProcess.GetNodeWithInternalIdentifier("OnDoorClosed");
-
-		HackingNode powerIn = hackingProcess.GetNodeWithInternalIdentifier("PowerIn");
-
-		HackingNode powerOut = hackingProcess.GetNodeWithInternalIdentifier("PowerOut");
-		powerOut.AddConnectedNode(powerIn);
-
-		HackingNode dummyIn = hackingProcess.GetNodeWithInternalIdentifier("DummyIn");
-
-		HackingNode dummyOut = hackingProcess.GetNodeWithInternalIdentifier("DummyOut");
-		dummyOut.AddConnectedNode(dummyIn);
 
 		hackingLoaded = true;
 

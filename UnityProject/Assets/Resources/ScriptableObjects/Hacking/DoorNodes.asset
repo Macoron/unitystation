@@ -174,5 +174,23 @@ MonoBehaviour:
     IsElectrocute: 0
     Description: 
   connections:
-    m_keys: []
-    m_values: []
+    m_keys:
+    - OnAttemptOpen
+    - OnAttemptClose
+    - OnShouldOpen
+    - OnShouldClose
+    - OnIDAccepted
+    - OnIDRejected
+    - ShouldDoPressureWarning
+    - PowerOut
+    - DummyOut
+    m_values:
+    - BeginOpenProcedure
+    - BeginCloseProcedure
+    - OpenDoor
+    - CloseDoor
+    - AcceptId
+    - RejectID
+    - DoPressureWarning
+    - PowerIn
+    - DummyIn

@@ -71,8 +71,8 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 	public void OnSpawnServer(SpawnInfo info)
 	{
 		itemStorage = GetComponent<ItemStorage>();
-		ServerGenerateNodesFromNodeInfo();
-		ServerLinkHackingNodes();
+		ServerGenerateNodesAndConnections();
+		ServerAddInputMethods();
 		SyncWiresExposed(wiresInitiallyExposed, wiresInitiallyExposed);
 	}
 
@@ -105,66 +105,93 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 		hackingGUI = hackUI;
 	}
 
-
-	public virtual void ServerLinkHackingNodes()
+	/// <summary>
+	/// Generate nodes from scriptable object and add them to internal node list
+	/// Also connects nodes to each other according to scriptable object connections
+	/// Keep in mind that connections are in random order each round
+	/// </summary>
+	public virtual void ServerGenerateNodesAndConnections()
 	{
-		// connect all nodes according to nodeInfo
-		if (nodeInfo)
+		if (!nodeInfo)
 		{
-			// get all conections from node info
-			var connections = nodeInfo.connections.ToArray();
+			return;
+		}
 
-			// shuffle them in random order
-			connections = Shuffle(connections);
+		var allNodes = nodeInfo.nodeInfoList.ToList();
+		var inputNodes = new List<HackingNode>();
+		var outputNodes = new List<HackingNode>();
 
-			// connect nodes
-			foreach (var pair in connections)
+		// get all conections from node info
+		var connections = nodeInfo.connections.ToArray();
+		// shuffle them in random order
+		connections = Shuffle(connections);
+
+		// now add connected nodes and register their connection
+		foreach (var con in connections)
+		{
+			var node1ID = con.Key;
+			var node2ID = con.Value;
+
+			// find both nodes data for this connection
+			var node1 = allNodes.FirstOrDefault((n) => n.InternalIdentifier == node1ID);
+			if (node1 == null)
 			{
-				var node1ID = pair.Key;
-				var node2ID = pair.Value;
+				Logger.LogError($"Unknown node {node1ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
+				continue;
+			}
+			var node2 = allNodes.FirstOrDefault((n) => n.InternalIdentifier == node2ID);
+			if (node2 == null)
+			{
+				Logger.LogError($"Unknown node {node2ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
+				continue;
+			}
 
-				var node1 = GetNodeWithInternalIdentifier(node1ID);
-				if (node1 == null)
-				{
-					Logger.LogError($"Unknown node {node1ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
-					continue;
-				}
+			// decide who is input and who is output
+			var input = node1.IsInput ? node1 : node2;
+			var output = node1.IsOutput ? node1 : node2;
+			if (input == output)
+			{
+				Logger.LogError($"Connection {node1ID}-{node2ID} in {nodeInfo.name} creates loop. Checks input/output toggles", Category.Hacking);
+				continue;
+			}
 
-				var node2 = GetNodeWithInternalIdentifier(node2ID);
-				if (node2 == null)
-				{
-					Logger.LogError($"Unknown node {node2ID} in connection {node1ID}-{node2ID} for {nodeInfo.name}.", Category.Hacking);
-					continue;
-				}
+			// conect input and output nodes
+			var inputNode = ToNode(input);
+			var outputNode = ToNode(output);
+			outputNode.AddConnectedNode(inputNode);
 
-				node1.AddConnectedNode(node2);
+			// add connection nodes to lists and remove them from search list
+			inputNodes.Add(inputNode);
+			outputNodes.Add(outputNode);
+			allNodes.Remove(input);
+			allNodes.Remove(output);
+		}
+
+		// only nodes with no connections left
+		foreach (var nodeInfo in allNodes)
+		{
+			var node = ToNode(nodeInfo);
+			if (node.IsInput)
+			{
+				inputNodes.Add(node);
+			}
+			else
+			{
+				outputNodes.Add(node);
 			}
 		}
+
+		// now add first input nodes, next output nodes
+		hackNodes = inputNodes.Concat(outputNodes).ToList();
 	}
 
 	/// <summary>
-	/// Generate nodes from scriptable object and add them to internal node list
+	/// Called after all nodes are generated and connected
+	/// Now you can add input methods to nodes
 	/// </summary>
-	public virtual void ServerGenerateNodesFromNodeInfo()
+	public virtual void ServerAddInputMethods()
 	{
-		foreach (HackingNodeInfo inf in nodeInfo.nodeInfoList)
-		{
-			HackingNode newNode = new HackingNode();
-			newNode.IsInput = inf.IsInput;
-			newNode.IsOutput = inf.IsOutput;
-			newNode.IsDeviceNode = inf.IsDeviceNode;
-			newNode.InternalIdentifier = inf.InternalIdentifier;
-			newNode.HiddenLabel = inf.HiddenLabel;
-			newNode.PublicLabel = inf.PublicLabel;
-			newNode.IsElectrocute = inf.IsElectrocute;
 
-			if (newNode.IsElectrocute)
-			{
-				newNode.AddWireCutCallback(ServerElectrocute);
-			}
-
-			hackNodes.Add(newNode);
-		}
 	}
 
 	//Node list is just undefined nodes for the client. Important, because it means that the client does not know what nodes does what. It just needs the same amount of nodes.
@@ -529,5 +556,25 @@ public abstract class HackingProcessBase : NetworkBehaviour, IPredictedCheckedIn
 
 		return connections.OrderBy((p) => rng.Next()).ToArray();
 	}
+
+	protected HackingNode ToNode(HackingNodeInfo nodeInfo)
+	{
+		var newNode = new HackingNode();
+		newNode.IsInput = nodeInfo.IsInput;
+		newNode.IsOutput = nodeInfo.IsOutput;
+		newNode.IsDeviceNode = nodeInfo.IsDeviceNode;
+		newNode.InternalIdentifier = nodeInfo.InternalIdentifier;
+		newNode.HiddenLabel = nodeInfo.HiddenLabel;
+		newNode.PublicLabel = nodeInfo.PublicLabel;
+		newNode.IsElectrocute = nodeInfo.IsElectrocute;
+
+		if (newNode.IsElectrocute)
+		{
+			newNode.AddWireCutCallback(ServerElectrocute);
+		}
+
+		return newNode;
+	}
+
 }
 

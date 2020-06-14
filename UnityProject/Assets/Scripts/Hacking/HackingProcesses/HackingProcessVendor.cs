@@ -63,9 +63,9 @@ public class HackingProcessVendor : HackingProcessBase
 		MaintancePanelSprite?.gameObject.SetActive(false);
 	}
 
-	public override void ServerLinkHackingNodes()
+	public override void ServerAddInputMethods()
 	{
-		base.ServerLinkHackingNodes();
+		base.ServerAddInputMethods();
 
 		var mainPowerSource = GetNodeWithInternalIdentifier("MainPowerSource");
 		var secondPowerSource = GetNodeWithInternalIdentifier("SecondPowerSource");
