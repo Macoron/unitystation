@@ -290,6 +290,11 @@ public class InteractableTiles : NetworkBehaviour, IClientInteractable<Positiona
 
 	bool checkWallMountOverlay()
 	{
+		if (!UIManager.Hands || !UIManager.Hands.CurrentSlot)
+		{
+			return false;
+		}
+
 		var handItem = UIManager.Hands.CurrentSlot.ItemObject;
 		if (handItem == null)
 		{
