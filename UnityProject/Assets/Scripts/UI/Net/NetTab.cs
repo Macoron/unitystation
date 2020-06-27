@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -112,6 +113,13 @@ public class NetTab : Tab
 		ConnectedPlayer newPeeper = PlayerList.Instance.Get(player);
 		Peepers.Add(newPeeper);
 		OnTabOpened.Invoke(newPeeper);
+
+		// Subscribe to event when player slipped
+		var regPlayer = player.GetComponent<RegisterPlayer>();
+		if (regPlayer)
+		{
+			regPlayer.OnSlipChangeServer.AddListener(OnPlayerSlipped);
+		}
 	}
 
 	public void RemovePlayer(GameObject player)
@@ -119,6 +127,22 @@ public class NetTab : Tab
 		ConnectedPlayer newPeeper = PlayerList.Instance.Get(player);
 		OnTabClosed.Invoke(newPeeper);
 		Peepers.Remove(newPeeper);
+
+		// Unsubscribe to event when player slipped or in crit
+		var regPlayer = player.GetComponent<RegisterPlayer>();
+		if (regPlayer)
+		{
+			regPlayer.OnSlipChangeServer.RemoveListener(OnPlayerSlipped);
+		}
+	}
+
+	private void OnPlayerSlipped(bool wasSlipped, bool isSlipped)
+	{
+		// if player slipped - close this tab
+		if (isSlipped)
+		{
+			ControlTabs.CloseTab(Type, Provider);
+		}
 	}
 
 	public void RescanElements()
