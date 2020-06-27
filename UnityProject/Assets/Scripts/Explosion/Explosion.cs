@@ -117,6 +117,13 @@ public class Explosion : MonoBehaviour
 		foreach (var damagedLiving in damagedLivingThings)
 		{
 			damagedLiving.ApplyDamage(gameObject, damage, AttackType.Bomb, DamageType.Burn);
+
+			// knock down living things (only players for now)
+			var player = damagedLiving.GetComponent<RegisterPlayer>();
+			if (player)
+			{
+				player.ServerSlip();
+			}
 		}
 	}
 
