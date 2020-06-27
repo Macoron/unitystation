@@ -26,8 +26,8 @@ public class Grenade : NetworkBehaviour, IPredictedInteractable<HandActivate>, I
 	public Pickupable pickupable;
 
 	// Zero and one sprites reserved for left and right hands
-	private const int LOCKED_SPRITE = 2;
-	private const int ARMED_SPRITE = 3;
+	private const int LOCKED_SPRITE = 0;
+	private const int ARMED_SPRITE = 1;
 
 	//whether this object has exploded
 	private bool hasExploded;
@@ -88,7 +88,7 @@ public class Grenade : NetworkBehaviour, IPredictedInteractable<HandActivate>, I
 		if (!timerRunning)
 		{
 			timerRunning = true;
-			PlayPinSFX(originator.transform.position);
+			PlayPinSFX();
 
 			if (unstableFuse)
 			{
@@ -148,9 +148,10 @@ public class Grenade : NetworkBehaviour, IPredictedInteractable<HandActivate>, I
 		}
 	}
 
-	private void PlayPinSFX(Vector3 position)
+	private void PlayPinSFX()
 	{
-		SoundManager.PlayNetworkedAtPos("armbomb", position, sourceObj: gameObject);
+		var position = gameObject.AssumedWorldPosServer();
+		SoundManager.PlayNetworkedAtPos("armbomb", position);
 	}
 
 	private void UpdateTimer(bool wasTimerRunning, bool timerRunning)
