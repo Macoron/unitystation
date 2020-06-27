@@ -25,7 +25,6 @@ public class Grenade : NetworkBehaviour, IPredictedInteractable<HandActivate>, I
 	[Tooltip("Used for inventory animation")]
 	public Pickupable pickupable;
 
-	// Zero and one sprites reserved for left and right hands
 	private const int LOCKED_SPRITE = 0;
 	private const int ARMED_SPRITE = 1;
 

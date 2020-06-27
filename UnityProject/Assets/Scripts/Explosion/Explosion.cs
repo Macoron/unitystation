@@ -122,7 +122,7 @@ public class Explosion : MonoBehaviour
 			var player = damagedLiving.GetComponent<RegisterPlayer>();
 			if (player)
 			{
-				player.ServerSlip();
+				player.ServerStun();
 			}
 		}
 	}
