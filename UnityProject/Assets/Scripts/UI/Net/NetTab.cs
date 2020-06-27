@@ -82,6 +82,15 @@ public class NetTab : Tab
 		AfterInitElements();
 	}
 
+	public virtual void OnDisable()
+	{
+		// this will close the tab in case object was destoyed
+		if (IsServer)
+		{
+			ControlTabs.CloseTab(Type, Provider);
+		}
+	}
+
 	private void AfterInitElements()
 	{
 		foreach (var element in CachedElements.Values.ToArray())
