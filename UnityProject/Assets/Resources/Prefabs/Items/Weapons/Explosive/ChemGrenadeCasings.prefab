@@ -1,41 +1,23 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &9197874253917913631
+--- !u!114 &4448156782450090480
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8594439505056330043}
+  m_GameObject: {fileID: 8390323157128225458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 136fb3d786941f649a6b2426ca00ec00, type: 3}
+  m_Script: {fileID: 11500000, guid: fdce8a163088453ca593c0e98f2c5f07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  pickupable: {fileID: 8561795974084681285}
-  spriteHandler: {fileID: 2450954382432651964}
-  explosionPrefab: {fileID: 1087697603680455443, guid: 048e03a155f6ed04bb8cc8984479ee4d,
-    type: 3}
---- !u!114 &6892728679566069607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8594439505056330043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61bca35dd9af7aa4289945e153d57e5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  unstableFuse: 0
-  fuseLength: 5
-  activationSound: armbomb
---- !u!1001 &8594560052825132417
+  itemStorageStructure: {fileID: 11400000, guid: 74bf3e872403e488695c17ecdde194ab,
+    type: 2}
+  itemStorageCapacity: {fileID: 11400000, guid: 411b6b7a74c524a91b9a38a0c692761b,
+    type: 2}
+  itemStoragePopulator: {fileID: 0}
+--- !u!1001 &8390323157128307669
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -44,15 +26,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1011433845357754, guid: a7abba22164ce49f0bf9b9b219f39298, type: 3}
       propertyPath: m_Name
-      value: Grenade
+      value: ChemGrenadeCasings
       objectReference: {fileID: 0}
     - target: {fileID: 4527534762131918, guid: a7abba22164ce49f0bf9b9b219f39298, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 4527534762131918, guid: a7abba22164ce49f0bf9b9b219f39298, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -461
       objectReference: {fileID: 0}
     - target: {fileID: 4527534762131918, guid: a7abba22164ce49f0bf9b9b219f39298, type: 3}
       propertyPath: m_LocalPosition.z
@@ -92,6 +74,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114738972662350094, guid: a7abba22164ce49f0bf9b9b219f39298,
         type: 3}
+      propertyPath: sceneId
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114738972662350094, guid: a7abba22164ce49f0bf9b9b219f39298,
+        type: 3}
       propertyPath: m_AssetId
       value: 
       objectReference: {fileID: 0}
@@ -99,34 +86,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: a9cf0172ca27b1b4bb8fdf337f25c029,
+      objectReference: {fileID: 21300000, guid: f2f66522b5f2ec44c85fd5e57331c577,
         type: 3}
-    - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: initialTraits.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
         type: 3}
       propertyPath: initialName
-      value: Grenade
+      value: chemical grenade
       objectReference: {fileID: 0}
     - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
         type: 3}
       propertyPath: initialDescription
-      value: It's a metal can with a pretty ring attached to it.
+      value: A custom made grenade.
       objectReference: {fileID: 0}
-    - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: initialSize
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: initialTraits.Array.data[0]
-      value: 
-      objectReference: {fileID: 11400000, guid: 6bbea9c4e0a1b4840bde0835b8db0b2a,
-        type: 2}
     - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
         type: 3}
       propertyPath: itemSprites.LeftHand.Texture
@@ -197,86 +168,14 @@ PrefabInstance:
       objectReference: {fileID: 4900000, guid: c1613c4f8364fdf46b580698434069cb, type: 3}
     - target: {fileID: 499351249353511896, guid: a7abba22164ce49f0bf9b9b219f39298,
         type: 3}
-      propertyPath: exportCost
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.size
+      propertyPath: initialSize
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[0].Sprites.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[1].Sprites.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[0].Texture
-      value: 
-      objectReference: {fileID: 2800000, guid: a9cf0172ca27b1b4bb8fdf337f25c029, type: 3}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[0].Sprites.Array.data[0]
-      value: 
-      objectReference: {fileID: 21300000, guid: a9cf0172ca27b1b4bb8fdf337f25c029,
-        type: 3}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[1].Texture
-      value: 
-      objectReference: {fileID: 2800000, guid: 377a0e944f5c0a84fb89d3cfa026e2cc, type: 3}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[1].Sprites.Array.data[0]
-      value: 
-      objectReference: {fileID: 21300000, guid: 377a0e944f5c0a84fb89d3cfa026e2cc,
-        type: 3}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[1].Sprites.Array.data[1]
-      value: 
-      objectReference: {fileID: 21300002, guid: 377a0e944f5c0a84fb89d3cfa026e2cc,
-        type: 3}
-    - target: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-        type: 3}
-      propertyPath: Sprites.Array.data[1].EquippedData
-      value: 
-      objectReference: {fileID: 4900000, guid: 9bd543e3660441949aa8aa2f922b2ab3, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7abba22164ce49f0bf9b9b219f39298, type: 3}
---- !u!1 &8594439505056330043 stripped
+--- !u!1 &8390323157128225458 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1011433845357754, guid: a7abba22164ce49f0bf9b9b219f39298,
     type: 3}
-  m_PrefabInstance: {fileID: 8594560052825132417}
+  m_PrefabInstance: {fileID: 8390323157128307669}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8561795974084681285 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114734890905785284, guid: a7abba22164ce49f0bf9b9b219f39298,
-    type: 3}
-  m_PrefabInstance: {fileID: 8594560052825132417}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8594439505056330043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e1ce0dbeeeb473dae66fb3610953c99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2450954382432651964 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6144467708197095229, guid: a7abba22164ce49f0bf9b9b219f39298,
-    type: 3}
-  m_PrefabInstance: {fileID: 8594560052825132417}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db025f3627a11af4fb670ccd1e2188ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
