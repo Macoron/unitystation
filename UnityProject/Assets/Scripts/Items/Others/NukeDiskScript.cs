@@ -19,9 +19,6 @@ public class NukeDiskScript : NetworkBehaviour
 	private EscapeShuttle escapeShuttle;
 
 	private float timeCheckDiskLocation = 5.0f;
-	private float timeCurrentDisk = 0;
-
-	private float timeCurrentAnimation = 0;
 
 	private bool isInit = false;
 	private bool boundsConfigured = false;
@@ -40,6 +37,9 @@ public class NukeDiskScript : NetworkBehaviour
 	{
 		base.OnStartServer();
 		Init();
+
+		// update server state of disk
+		UpdateManager.Add(UpdateMe, timeCheckDiskLocation);
 	}
 
 	public override void OnStartClient()
@@ -67,38 +67,21 @@ public class NukeDiskScript : NetworkBehaviour
 		boundsConfigured = true;
 	}
 
-	private void OnEnable()
-	{
-		UpdateManager.Add(CallbackType.UPDATE, UpdateMe);
-	}
 	void OnDisable()
 	{
-		UpdateManager.Remove(CallbackType.UPDATE, UpdateMe);
+		if (isServer)
+		{
+			UpdateManager.Remove(CallbackType.PERIODIC_UPDATE, UpdateMe);
+		}
 	}
 
 	protected virtual void UpdateMe()
 	{
 		if (!boundsConfigured) return;
 
-		if (isServer)
+		if (!stopAutoTeleport)
 		{
-			timeCurrentDisk += Time.deltaTime;
-
-			if (timeCurrentDisk > timeCheckDiskLocation && !stopAutoTeleport)
-			{
-				if (DiskLost()) { Teleport();}
-				timeCurrentDisk = 0;
-			}
-		}
-		else
-		{
-			timeCurrentAnimation += Time.deltaTime;
-			if (timeCurrentAnimation > 0.1f)
-			{
-				pick.RefreshUISlotImage();
-				timeCurrentAnimation = 0;
-			}
-
+			if (DiskLost()) { Teleport();}
 		}
 	}
 
@@ -155,7 +138,6 @@ public class NukeDiskScript : NetworkBehaviour
 		if (pick?.ItemSlot != null)
 		{
 			Inventory.ServerDrop(pick.ItemSlot);
-			pick.RefreshUISlotImage();
 		}
 		customNetTrans.SetPosition(position);
 	}
