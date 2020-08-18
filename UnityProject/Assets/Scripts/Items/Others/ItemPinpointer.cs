@@ -25,9 +25,19 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	public float mediumMagnitude = 40;
 	public float closeMagnitude = 10;
 
-	private int spriteSheetVariant;
+	private const int SOUTH_SPRITE = 0;
+	private const int NORTH_SPRITE = 1;
+	private const int EAST_SPRITE = 2;
+	private const int WEST_SPRITE = 3;
+	private const int SE_SPRITE = 4;
+	private const int SW_SPRITE = 5;
+	private const int NE_SPRITE = 6;
+	private const int NW_SPRITE = 7;
 
-	private int spriteVariant;
+	private const int FAR_SHEET = 0;
+	private const int MEDIUM_SHEET = 1;
+	private const int CLOSE_SHEET = 2;
+	private const int DIRECT_SHEET = 3;
 
 	private void Start()
 	{
@@ -57,97 +67,86 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 
 	}
 
-	private void ChangeAngleofSprite(Vector3 moveDirection)
+	private void ChangeAngleofSprite()
 	{
+		// find direction to target
+		var dirToTarget = objectToTrack.AssumedWorldPosServer() - gameObject.AssumedWorldPosServer();
 
-		float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
-		if (CheckDistance(moveDirection))
+		// check if they have same position
+		if (dirToTarget == Vector3.zero)
 		{
-			AngleUpdate(angle);
+			//ServerChangeSpriteVariant(0);
+			ServerChangeSpriteSheetVariant(DIRECT_SHEET);
+			return;
 		}
+
+		// set distance sprite (animation blink intensity)
+		UpdateDistanceSprite(dirToTarget);
+
+		// get angle between direction to object and north and update arrow
+		float angle = Vector2.SignedAngle(Vector2.up, dirToTarget);
+		AngleUpdate(angle);
 	}
-	private bool CheckDistance(Vector3 moveDirection)
+	private void UpdateDistanceSprite(Vector3 moveDirection)
 	{
 		if (moveDirection.magnitude > mediumMagnitude)
 		{
-			ServerChangeSpriteSheetVariant(4);
-
+			ServerChangeSpriteSheetVariant(FAR_SHEET);
 		}
 		else if (moveDirection.magnitude > closeMagnitude)
 		{
-			ServerChangeSpriteSheetVariant(1);
+			ServerChangeSpriteSheetVariant(MEDIUM_SHEET);
 		}
-		else if (moveDirection.magnitude < closeMagnitude)
+		else
 		{
-			if (moveDirection == Vector3.zero)
-			{
-				ServerChangeSpriteVariant(0);
-				ServerChangeSpriteSheetVariant(3);
-				return false;
-			}
-			ServerChangeSpriteSheetVariant(2);
-
+			ServerChangeSpriteSheetVariant(CLOSE_SHEET);
 		}
-		return true;
 	}
 	private void AngleUpdate(float angle)
 	{
+		// moving clockwise
 		switch (angle)
 		{
 			case 0f:
-				ServerChangeSpriteVariant(2);
-				return;
-			case 180.0f:
-				ServerChangeSpriteVariant(3);
+				ServerChangeSpriteVariant(NORTH_SPRITE);
 				return;
 			case -90.0f:
-				ServerChangeSpriteVariant(0);
+				ServerChangeSpriteVariant(EAST_SPRITE);
+				return;
+			case 180.0f:
+				ServerChangeSpriteVariant(SOUTH_SPRITE);
 				return;
 			case 90.0f:
-				ServerChangeSpriteVariant(1);
+				ServerChangeSpriteVariant(WEST_SPRITE);
 				return;
 			default:
 				break;
 		}
+
+		// based on orientation above
 		if(angle < 0.0f && angle > -90.0f)
 		{
-			ServerChangeSpriteVariant(4);
+			ServerChangeSpriteVariant(NE_SPRITE);
 			return;
 		}
 		if (angle > 0.0f && angle < 90.0f)
 		{
-			ServerChangeSpriteVariant(6);
+			ServerChangeSpriteVariant(NW_SPRITE);
 			return;
 		}
 		if (angle > 90.0f && angle < 180.0f)
 		{
-			ServerChangeSpriteVariant(7);
+			ServerChangeSpriteVariant(SW_SPRITE);
 			return;
 		}
 		if (angle < -90.0f)
 		{
-			ServerChangeSpriteVariant(5);
+			ServerChangeSpriteVariant(SE_SPRITE);
 			return;
 		}
-
 	}
 
-	private void SyncSheetVariant(int newSheetVar)
-	{
-		spriteVariant = 0;
-		spriteHandler.ChangeSpriteVariant(0);
-		spriteSheetVariant = newSheetVar;
-		spriteHandler.ChangeSprite(spriteSheetVariant);
-		pick.RefreshUISlotImage();
 
-	}
-
-	private void SyncVariant(int newVar)
-	{
-		spriteVariant = newVar;
-		spriteHandler.ChangeSpriteVariant(newVar);
-		pick.RefreshUISlotImage();
-	}
 	private void EnsureInit()
 	{
 		pick = GetComponent<Pickupable>();
@@ -163,21 +162,21 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 			isOn = !isOn;
 			ServerChangeSpriteVariant(0);
 			ServerChangeSpriteSheetVariant(0);
-			pick.RefreshUISlotImage();
 	}
 
 	[Server]
 	private void ServerChangeSpriteSheetVariant(int newSheetVar)
 	{
-		spriteSheetVariant = newSheetVar;
-		SyncSheetVariant(spriteSheetVariant);
+		spriteHandler?.ChangeSprite(newSheetVar);
 	}
 
 	[Server]
 	private void ServerChangeSpriteVariant(int newVar)
 	{
-		spriteVariant = newVar;
+		spriteHandler?.ChangeSpriteVariant(newVar);
 	}
+
+
 	protected virtual void UpdateMe()
 	{
 		if (isServer)
@@ -188,8 +187,7 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 			{
 				if (isOn)
 				{
-					Vector3 moveDirection = objectToTrack.AssumedWorldPosServer() - gameObject.AssumedWorldPosServer();
-					ChangeAngleofSprite(moveDirection);
+					ChangeAngleofSprite();
 				}
 				timeElapsedSprite = 0;
 			}
@@ -199,7 +197,6 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 			timeElapsedIcon += Time.deltaTime;
 			if (timeElapsedIcon > 0.2f)
 			{
-				pick.RefreshUISlotImage();
 				timeElapsedIcon = 0;
 			}
 		}
