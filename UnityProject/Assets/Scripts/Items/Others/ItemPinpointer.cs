@@ -191,7 +191,12 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	private void CleintIsOnChanged(bool oldVal, bool isOn)
 	{
 		spriteHandler?.gameObject.SetActive(isOn);
-		spriteHandler?.PushTexture();
+
+		if (isOn)
+		{
+			// need to force update texture
+			spriteHandler?.PushTexture();
+		}
 	}
 
 	[Server]
