@@ -13,12 +13,10 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	private GameObject objectToTrack;
 	private SpriteHandler spriteHandler;
 
-	private ItemsSprites newSprites = new ItemsSprites();
-	private Pickupable pick;
 	private float timeElapsedSprite = 0;
 	private float timeElapsedIcon = 0;
-	public float timeWait = 1;
 
+	[SyncVar(hook = nameof(CleintIsOnChanged))]
 	private bool isOn = false;
 
 	public float maxMagnitude = 80;
@@ -38,56 +36,79 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	private const int MEDIUM_SHEET = 1;
 	private const int CLOSE_SHEET = 2;
 	private const int DIRECT_SHEET = 3;
+	private const int ERROR_SHEET = 4;
 
 	private void Start()
 	{
-		var NukeDisks = FindObjectsOfType<NukeDiskScript>();
+		if (rendererSprite)
+		{
+			spriteHandler = rendererSprite.GetComponent<SpriteHandler>();
+		}
 
+		spriteHandler?.gameObject.SetActive(isOn);
+	}
+
+	public override void OnStartServer()
+	{
+		base.OnStartServer();
+		FindTargetItem();
+		UpdateManager.Add(ServerUpdate, 1f);
+	}
+
+	private void OnDisable()
+	{
+		if (isServer)
+		{
+			UpdateManager.Remove(CallbackType.UPDATE, ServerUpdate);
+		}
+	}
+
+	[Server]
+	public virtual void FindTargetItem()
+	{
+		var NukeDisks = FindObjectsOfType<NukeDiskScript>();
 		foreach (var nukeDisk in NukeDisks)
 		{
 			if (nukeDisk == null) continue;
 
-			if(!nukeDisk.secondaryNukeDisk)
+			if (!nukeDisk.secondaryNukeDisk)
 			{
-				objectToTrack =  nukeDisk.gameObject;
+				objectToTrack = nukeDisk.gameObject;
 				break;
 			}
 		}
 	}
 
-	private void OnEnable()
+	[Server]
+	private void ServerUpdateSprites()
 	{
-		UpdateManager.Add(CallbackType.UPDATE, UpdateMe);
-		EnsureInit();
-	}
-	void OnDisable()
-	{
+		// check if target still valid
+		if (!objectToTrack)
+		{
+			ServerChangeSpriteSheetVariant(ERROR_SHEET);
+			return;
+		}
 
-		UpdateManager.Remove(CallbackType.UPDATE, UpdateMe);
-
-	}
-
-	private void ChangeAngleofSprite()
-	{
 		// find direction to target
 		var dirToTarget = objectToTrack.AssumedWorldPosServer() - gameObject.AssumedWorldPosServer();
 
 		// check if they have same position
 		if (dirToTarget == Vector3.zero)
 		{
-			//ServerChangeSpriteVariant(0);
 			ServerChangeSpriteSheetVariant(DIRECT_SHEET);
 			return;
 		}
 
 		// set distance sprite (animation blink intensity)
-		UpdateDistanceSprite(dirToTarget);
+		ServerUpdateDistanceSprite(dirToTarget);
 
 		// get angle between direction to object and north and update arrow
 		float angle = Vector2.SignedAngle(Vector2.up, dirToTarget);
-		AngleUpdate(angle);
+		ServerUpdateAngleSprite(angle);
 	}
-	private void UpdateDistanceSprite(Vector3 moveDirection)
+
+	[Server]
+	private void ServerUpdateDistanceSprite(Vector3 moveDirection)
 	{
 		if (moveDirection.magnitude > mediumMagnitude)
 		{
@@ -102,7 +123,9 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 			ServerChangeSpriteSheetVariant(CLOSE_SHEET);
 		}
 	}
-	private void AngleUpdate(float angle)
+
+	[Server]
+	private void ServerUpdateAngleSprite(float angle)
 	{
 		// moving clockwise
 		switch (angle)
@@ -146,22 +169,10 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 		}
 	}
 
-
-	private void EnsureInit()
-	{
-		pick = GetComponent<Pickupable>();
-		spriteHandler = rendererSprite.GetComponent<SpriteHandler>();
-	}
-
+	[Server]
 	public void ServerPerformInteraction(HandActivate interaction)
 	{
-			if(objectToTrack == null)
-			{
-				objectToTrack = FindObjectOfType<NukeDiskScript>().gameObject;
-			}
-			isOn = !isOn;
-			ServerChangeSpriteVariant(0);
-			ServerChangeSpriteSheetVariant(0);
+		isOn = !isOn;
 	}
 
 	[Server]
@@ -176,29 +187,19 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 		spriteHandler?.ChangeSpriteVariant(newVar);
 	}
 
-
-	protected virtual void UpdateMe()
+	[Client]
+	private void CleintIsOnChanged(bool oldVal, bool isOn)
 	{
-		if (isServer)
-		{
+		spriteHandler?.gameObject.SetActive(isOn);
+		spriteHandler?.PushTexture();
+	}
 
-			timeElapsedSprite += Time.deltaTime;
-			if (timeElapsedSprite > timeWait)
-			{
-				if (isOn)
-				{
-					ChangeAngleofSprite();
-				}
-				timeElapsedSprite = 0;
-			}
-		}
-		else
+	[Server]
+	protected virtual void ServerUpdate()
+	{
+		if (isOn)
 		{
-			timeElapsedIcon += Time.deltaTime;
-			if (timeElapsedIcon > 0.2f)
-			{
-				timeElapsedIcon = 0;
-			}
+			ServerUpdateSprites();
 		}
 	}
 }
