@@ -13,9 +13,6 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	private GameObject objectToTrack;
 	private SpriteHandler spriteHandler;
 
-	private float timeElapsedSprite = 0;
-	private float timeElapsedIcon = 0;
-
 	[SyncVar(hook = nameof(CleintIsOnChanged))]
 	private bool isOn = false;
 
@@ -59,7 +56,7 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 	{
 		if (isServer)
 		{
-			UpdateManager.Remove(CallbackType.UPDATE, ServerUpdate);
+			UpdateManager.Remove(CallbackType.PERIODIC_UPDATE, ServerUpdate);
 		}
 	}
 
