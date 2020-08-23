@@ -115,14 +115,14 @@ public class SpriteHandler : MonoBehaviour
 		return NetworkIdentity;
 	}
 
-	public void ChangeSprite(int SubCataloguePage, bool Network = true)
+	public bool ChangeSprite(int SubCataloguePage, bool Network = true)
 	{
-		if (SubCataloguePage == cataloguePage) return;
+		if (SubCataloguePage == cataloguePage) return false;
 
 		if ((SubCataloguePage >= SubCatalogue.Count))
 		{
 			Logger.LogError("new SubCataloguePage Is out of bounds on " + this.transform.parent.gameObject);
-			return;
+			return false;
 		}
 
 		cataloguePage = SubCataloguePage;
@@ -138,6 +138,8 @@ public class SpriteHandler : MonoBehaviour
 				NetUpdate(NewCataloguePage: SubCataloguePage);
 			}
 		}
+
+		return true;
 	}
 
 
@@ -181,7 +183,7 @@ public class SpriteHandler : MonoBehaviour
 		TryToggleAnimationState(false);
 	}
 
-	public void ChangeSpriteVariant(int spriteVariant, bool NetWork = true)
+	public bool ChangeSpriteVariant(int spriteVariant, bool NetWork = true)
 	{
 		if (PresentSpriteSet != null)
 		{
@@ -203,8 +205,27 @@ public class SpriteHandler : MonoBehaviour
 				{
 					NetUpdate(NewVariantIndex: spriteVariant);
 				}
+
+				return true;
 			}
 		}
+
+		return false;
+	}
+
+	public void ChangeCatalogueAndVariant(int catalogueIndex, int spriteVariant, bool NetWork = true)
+	{
+		var isCatologueChanged = ChangeSprite(catalogueIndex, false);
+		var isVariantChagned = ChangeSpriteVariant(spriteVariant, false);
+		if (NetWork)
+		{
+			int netCatalogue = isCatologueChanged ? catalogueIndex : -1;
+			int netVariant = isVariantChagned ? spriteVariant : -1;
+
+			NetUpdate(NewCataloguePage: netCatalogue,
+					NewVariantIndex: netVariant);
+		}
+
 	}
 
 	public void SetColor(Color value, bool NetWork = true)

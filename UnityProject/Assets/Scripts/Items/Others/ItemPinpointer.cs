@@ -82,7 +82,7 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 		// check if target still valid
 		if (!objectToTrack)
 		{
-			ServerChangeSpriteSheetVariant(ERROR_SHEET);
+			ServerChangeSpriteSheetAndVariant(ERROR_SHEET, 0);
 			return;
 		}
 
@@ -92,53 +92,54 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 		// check if they have same position
 		if (dirToTarget == Vector3.zero)
 		{
-			ServerChangeSpriteSheetVariant(DIRECT_SHEET);
+			ServerChangeSpriteSheetAndVariant(DIRECT_SHEET, 0);
 			return;
 		}
 
-		// set distance sprite (animation blink intensity)
-		ServerUpdateDistanceSprite(dirToTarget);
+		// update distance sprite (animation blink intensity and color)
+		var spriteID = ServerGetDistanceSprite(dirToTarget);
 
 		// get angle between direction to object and north and update arrow
 		float angle = Vector2.SignedAngle(Vector2.up, dirToTarget);
-		ServerUpdateAngleSprite(angle);
+		int varID = ServerUpdateAngleSprite(angle);
+
+		ServerChangeSpriteSheetAndVariant(spriteID, varID);
 	}
 
 	[Server]
-	private void ServerUpdateDistanceSprite(Vector3 moveDirection)
+	private int ServerGetDistanceSprite(Vector3 moveDirection)
 	{
 		if (moveDirection.magnitude > mediumMagnitude)
 		{
-			ServerChangeSpriteSheetVariant(FAR_SHEET);
+			return FAR_SHEET;
 		}
 		else if (moveDirection.magnitude > closeMagnitude)
 		{
-			ServerChangeSpriteSheetVariant(MEDIUM_SHEET);
+			return MEDIUM_SHEET;
 		}
 		else
 		{
-			ServerChangeSpriteSheetVariant(CLOSE_SHEET);
+			return CLOSE_SHEET;
 		}
 	}
 
 	[Server]
-	private void ServerUpdateAngleSprite(float angle)
+	private int ServerUpdateAngleSprite(float angle)
 	{
-		// moving clockwise
+		// TODO: rewrite with something like this
+		// https://stackoverflow.com/questions/35104991/relative-cardinal-direction-of-two-coordinates
+
+		// moving counter-clockwise
 		switch (angle)
 		{
 			case 0f:
-				ServerChangeSpriteVariant(NORTH_SPRITE);
-				return;
+				return NORTH_SPRITE;
 			case -90.0f:
-				ServerChangeSpriteVariant(EAST_SPRITE);
-				return;
+				return EAST_SPRITE;
 			case 180.0f:
-				ServerChangeSpriteVariant(SOUTH_SPRITE);
-				return;
+				return SOUTH_SPRITE;
 			case 90.0f:
-				ServerChangeSpriteVariant(WEST_SPRITE);
-				return;
+				return WEST_SPRITE;
 			default:
 				break;
 		}
@@ -146,49 +147,49 @@ public class ItemPinpointer : NetworkBehaviour, IInteractable<HandActivate>
 		// based on orientation above
 		if(angle < 0.0f && angle > -90.0f)
 		{
-			ServerChangeSpriteVariant(NE_SPRITE);
-			return;
+			return NE_SPRITE;
 		}
 		if (angle > 0.0f && angle < 90.0f)
 		{
-			ServerChangeSpriteVariant(NW_SPRITE);
-			return;
+			return NW_SPRITE;
 		}
 		if (angle > 90.0f && angle < 180.0f)
 		{
-			ServerChangeSpriteVariant(SW_SPRITE);
-			return;
+			return SW_SPRITE;
 		}
 		if (angle < -90.0f)
 		{
-			ServerChangeSpriteVariant(SE_SPRITE);
-			return;
+			return SE_SPRITE;
 		}
+
+		return -1;
 	}
 
 	[Server]
 	public void ServerPerformInteraction(HandActivate interaction)
 	{
-		isOn = !isOn;
+		var newIsOn = !isOn;
+		if (newIsOn)
+		{
+			// first update sprites before showing graphics
+			// this will make sure that playe will see correct direction
+			ServerUpdateSprites();
+		}
+
+		// next toggle graphics
+		isOn = newIsOn;
 	}
 
 	[Server]
-	private void ServerChangeSpriteSheetVariant(int newSheetVar)
+	private void ServerChangeSpriteSheetAndVariant(int newSheet, int newVar)
 	{
-		spriteHandler?.ChangeSprite(newSheetVar);
-	}
-
-	[Server]
-	private void ServerChangeSpriteVariant(int newVar)
-	{
-		spriteHandler?.ChangeSpriteVariant(newVar);
+		spriteHandler?.ChangeCatalogueAndVariant(newSheet, newVar);
 	}
 
 	[Client]
 	private void CleintIsOnChanged(bool oldVal, bool isOn)
 	{
 		spriteHandler?.gameObject.SetActive(isOn);
-
 		if (isOn)
 		{
 			// need to force update texture
