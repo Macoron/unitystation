@@ -27,8 +27,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a639272f1958a4418bb81e65765aad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   buttPrefab: {fileID: 9060380378923672138, guid: 76c1cf9465a29384faac0d9df2eec3c9,
     type: 3}
   smokeTimeSeconds: 180
@@ -79,6 +77,18 @@ MonoBehaviour:
       m_values:
       - 15
   destroyOnEmpty: 0
+--- !u!114 &2168993037067061497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7338509426998086507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3624f75614c6c048ae6ac1f443dc681, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &914002857922276842
 PrefabInstance:
   m_ObjectHideFlags: 0
