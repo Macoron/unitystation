@@ -6,8 +6,7 @@ using Mirror;
 /// <summary>
 /// Base class for smokable cigarette
 /// </summary>
-public class Cigarette : NetworkBehaviour, ICheckedInteractable<HandApply>,
-	ICheckedInteractable<InventoryApply>, IServerDespawn
+public class Cigarette : MonoBehaviour
 {
 	private const int DEFAULT_SPRITE = 0;
 	private const int LIT_SPRITE = 1;
@@ -23,64 +22,22 @@ public class Cigarette : NetworkBehaviour, ICheckedInteractable<HandApply>,
 	public SpriteHandler spriteHandler = null;
 	private FireSource fireSource = null;
 	private Pickupable pickupable = null;
-
-	[SyncVar]
-	private bool isLit = false;
+	private Flamable flamable = null;
 
 	private void Awake()
 	{
 		pickupable = GetComponent<Pickupable>();
 		fireSource = GetComponent<FireSource>();
-	}
 
-	#region Interactions
-	public void ServerPerformInteraction(HandApply interaction)
-	{
-		TryLightByObject(interaction.UsedObject);
-	}
-
-	public void ServerPerformInteraction(InventoryApply interaction)
-	{
-		TryLightByObject(interaction.UsedObject);
-	}
-
-	public bool WillInteract(HandApply interaction, NetworkSide side)
-	{
-		// standard validation for interaction
-		if (!DefaultWillInteract.Default(interaction, side))
+		flamable = GetComponent<Flamable>();
+		if (flamable)
 		{
-			return false;
-		}
-
-		return CheckInteraction(interaction, side);
-	}
-
-	public bool WillInteract(InventoryApply interaction, NetworkSide side)
-	{
-		// standard validation for interaction
-		if (!DefaultWillInteract.Default(interaction, side))
-		{
-			return false;
-		}
-
-		return CheckInteraction(interaction, side);
-	}
-
-	private bool CheckInteraction(Interaction interaction, NetworkSide side)
-	{
-		// check if player want to use some light-source
-		if (interaction.UsedObject)
-		{
-			var lightSource = interaction.UsedObject.GetComponent<FireSource>();
-			if (lightSource)
+			flamable.ServerOnWasLit += (source) =>
 			{
-				return true;
-			}
+				ServerChangeLit(true);
+			};
 		}
-
-		return false;
 	}
-	#endregion
 
 	private void ServerChangeLit(bool isLitNow)
 	{
@@ -98,37 +55,12 @@ public class Cigarette : NetworkBehaviour, ICheckedInteractable<HandApply>,
 			fireSource.IsBurning = isLitNow;
 		}
 
-		if (isLitNow)
-		{
-			StartCoroutine(FireRoutine());
-		}
-
-		isLit = isLitNow;
+		StartCoroutine(FireRoutine());
 	}
 
 	public void OnDespawnServer(DespawnInfo info)
 	{
 		ServerChangeLit(false);
-	}
-
-	private bool TryLightByObject(GameObject usedObject)
-	{
-		if (!isLit)
-		{
-			// check if player tries to lit cigarette with something
-			if (usedObject != null)
-			{
-				// check if it's something like lighter or candle
-				var fireSource = usedObject.GetComponent<FireSource>();
-				if (fireSource && fireSource.IsBurning)
-				{
-					ServerChangeLit(true);
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	private void Burn()
@@ -137,7 +69,7 @@ public class Cigarette : NetworkBehaviour, ICheckedInteractable<HandApply>,
 		var tr = gameObject.transform.parent;
 		var rotation = RandomUtils.RandomRotatation2D();
 
-		// Print burn out message if in players inventory
+		// Print burn out message if in players inventory 
 		if (pickupable && pickupable.ItemSlot != null)
 		{
 			var player = pickupable.ItemSlot.Player;
